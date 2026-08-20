@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MultiCopy - Excel Autofill</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">⚡</div>
+        <div class="brand-info">
+          <h1>MultiCopy</h1>
+          <span class="brand-subtitle">Excel Form Autofill</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="btn-manage-profiles" class="icon-btn" title="Gestionar perfiles">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- VIEW 1: MAIN VIEW -->
+    <main id="view-main" class="view active">
+      <!-- Selector de Perfil Activo -->
+      <section class="section-card">
+        <label class="section-label" for="select-profile">Perfil de Formulario:</label>
+        <div class="profile-select-wrapper">
+          <select id="select-profile" class="form-control select-control">
+            <!-- Rellenado dinámicamente -->
+          </select>
+          <button id="btn-config-current-profile" class="btn-secondary btn-sm" title="Configurar campos del perfil">
+            ⚙️ Configurar
+          </button>
+        </div>
+      </section>
+
+      <!-- Estado de Portapapeles -->
+      <section class="section-card clipboard-card">
+        <div class="card-header-row">
+          <div class="status-indicator-group">
+            <span id="clipboard-status-dot" class="status-dot dot-gray"></span>
+            <span id="clipboard-status-text" class="status-text">Leyendo portapapeles...</span>
+          </div>
+          <button id="btn-refresh-clipboard" class="btn-ghost btn-sm" title="Releer portapapeles">
+            🔄 Actualizar
+          </button>
+        </div>
+
+        <div id="clipboard-warning" class="alert-box alert-warning hidden">
+          ⚠️ <strong>Varias filas copiadas:</strong> Se utilizará únicamente la 1ª fila.
+        </div>
+
+        <div id="clipboard-empty-hint" class="hint-box">
+          <p>📋 Copia una fila en Excel (<strong>Ctrl + C</strong>) para rellenar automáticamente.</p>
+        </div>
+
+        <!-- Vista Previa de Mapeo -->
+        <div id="preview-container" class="preview-box hidden">
+          <div class="preview-header">
+            <span class="preview-title">Vista previa de datos:</span>
+            <span id="preview-col-count" class="badge">0 columnas</span>
+          </div>
+          <div id="preview-list" class="preview-list">
+            <!-- Rellenado dinámicamente -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Botón Principal Rellenar -->
+      <section class="actions-container">
+        <button id="btn-fill-form" class="btn-primary btn-block btn-lg" disabled>
+          <span class="btn-icon">⚡</span> RELLENAR FORMULARIO
+        </button>
+        <div id="fill-feedback" class="feedback-msg"></div>
+      </section>
+    </main>
+
+    <!-- VIEW 2: PROFILES MANAGEMENT VIEW -->
+    <main id="view-profiles" class="view">
+      <div class="view-header">
+        <button id="btn-back-from-profiles" class="btn-ghost btn-sm">
+          ← Volver
+        </button>
+        <h2>Perfiles</h2>
+      </div>
+
+      <div class="create-profile-card">
+        <label class="section-label">Crear nuevo perfil:</label>
+        <div class="input-action-group">
+          <input type="text" id="input-new-profile-name" class="form-control" placeholder="Ej: Formulario Trabajadores">
+          <button id="btn-create-profile" class="btn-primary">+ Crear</button>
+        </div>
+      </div>
+
+      <div class="profiles-list-section">
+        <label class="section-label">Perfiles existentes:</label>
+        <div id="profiles-list" class="items-list">
+          <!-- Rellenado dinámicamente -->
+        </div>
+      </div>
+    </main>
+
+    <!-- VIEW 3: FIELD CONFIGURATION VIEW -->
+    <main id="view-fields" class="view">
+      <div class="view-header">
+        <button id="btn-back-from-fields" class="btn-ghost btn-sm">
+          ← Volver
+        </button>
+        <h2 id="fields-view-title">Campos del Perfil</h2>
+      </div>
+
+      <!-- Configuración de Dominio Opcional -->
+      <div class="domain-binding-card">
+        <label class="section-label" for="input-profile-domain">Dominio / URL asociada (opcional):</label>
+        <div class="input-action-group">
+          <input type="text" id="input-profile-domain" class="form-control" placeholder="Ej: empresa.cl o mi-sitio.com">
+          <button id="btn-save-domain" class="btn-secondary btn-sm">Guardar</button>
+        </div>
+      </div>
+
+      <!-- Formulario para agregar / editar campo -->
+      <div class="field-editor-card">
+        <h3 id="field-form-title">Agregar nuevo campo</h3>
+        <input type="hidden" id="edit-field-id" value="">
+        
+        <div class="form-group">
+          <label class="field-label" for="input-field-name">Nombre / Etiqueta del campo:</label>
+          <input type="text" id="input-field-name" class="form-control" placeholder="Ej: RUT, Nombre, Correo...">
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="field-label" for="input-column-index">Columna Excel (1, 2, 3...):</label>
+            <input type="number" id="input-column-index" class="form-control" min="1" max="100" value="1">
+          </div>
+          <div class="form-group">
+            <label class="field-label">Vincular elemento web:</label>
+            <button id="btn-start-pick-element" class="btn-accent btn-block" type="button">
+              🎯 Seleccionar en web
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="field-label" for="input-field-selector">Selector CSS generado:</label>
+          <input type="text" id="input-field-selector" class="form-control form-control-sm" placeholder="Autogenerado al seleccionar en web">
+        </div>
+
+        <div class="card-footer-buttons">
+          <button id="btn-cancel-edit-field" class="btn-ghost btn-sm hidden" type="button">Cancelar</button>
+          <button id="btn-save-field" class="btn-primary btn-sm" type="button">💾 Guardar Campo</button>
+        </div>
+      </div>
+
+      <!-- Lista de Campos Configurados -->
+      <div class="fields-list-section">
+        <div class="section-title-row">
+          <label class="section-label">Campos configurados:</label>
+          <span id="fields-count-badge" class="badge">0 campos</span>
+        </div>
+        <div id="fields-list" class="items-list">
+          <!-- Rellenado dinámicamente -->
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <span>MultiCopy v1.0 • 100% Local y Privado</span>
+    </footer>
+  </div>
+
+  <script src="../utils/storage.js"></script>
+  <script src="../utils/clipboard.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

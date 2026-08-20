@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Página de Prueba - MultiCopy</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --border: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #38bdf8;
+      --primary-hover: #0284c7;
+      --success: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      max-width: 850px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    }
+
+    h1 {
+      font-size: 20px;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-control {
+      width: 100%;
+      background: #0b1120;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      padding: 10px 12px;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.15s ease;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 70px;
+    }
+
+    .radio-group, .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .option-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      text-transform: none;
+      font-weight: normal;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .btn-sample {
+      background: #0284c7;
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 12px;
+      transition: background 0.15s;
+    }
+
+    .btn-sample:hover {
+      background: #0369a1;
+    }
+
+    .btn-reset {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .btn-reset:hover {
+      color: #fff;
+      border-color: #475569;
+    }
+
+    /* Event log */
+    .log-box {
+      background: #0b1120;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      height: 280px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 11px;
+      color: #38bdf8;
+    }
+
+    .log-entry {
+      margin-bottom: 4px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 3px;
+    }
+
+    .log-time {
+      color: var(--text-muted);
+    }
+
+    .sample-data-box {
+      background: #0b1120;
+      border: 1px dashed var(--border);
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      overflow-x: auto;
+    }
+
+    .sample-data-box code {
+      color: #38bdf8;
+      white-space: pre;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- FORMULARIO DE PRUEBA -->
+    <div class="card">
+      <h1>Formulario de Prueba</h1>
+      <p class="subtitle">Utiliza este formulario para probar la selección visual y el autocompletado de MultiCopy.</p>
+
+      <form id="test-form" onsubmit="event.preventDefault(); alert('Formulario enviado!');">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="rut">RUT:</label>
+            <input type="text" id="rut" name="rut" class="form-control" placeholder="12.345.678-9">
+          </div>
+          <div class="form-group">
+            <label for="telefono">Teléfono:</label>
+            <input type="tel" id="telefono" name="telefono" class="form-control" placeholder="912345678">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Juan">
+          </div>
+          <div class="form-group">
+            <label for="apellido">Apellido:</label>
+            <input type="text" id="apellido" name="apellido" class="form-control" placeholder="Pérez">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Correo Electrónico:</label>
+          <input type="email" id="email" name="email" class="form-control" placeholder="juan@email.com">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="fecha_nacimiento">Fecha de Nacimiento:</label>
+            <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="sexo">Sexo / Género:</label>
+            <select id="sexo" name="sexo" class="form-control">
+              <option value="">Seleccione una opción...</option>
+              <option value="M">Masculino</option>
+              <option value="F">Femenino</option>
+              <option value="O">Otro</option>
+              <option value="ND">Prefiero no decir</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="observaciones">Observaciones / Comentarios:</label>
+          <textarea id="observaciones" name="observaciones" class="form-control" placeholder="Observaciones adicionales..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Tipo de Contrato:</label>
+          <div class="radio-group">
+            <label class="option-label">
+              <input type="radio" name="contrato" value="Indefinido"> Indefinido
+            </label>
+            <label class="option-label">
+              <input type="radio" name="contrato" value="Plazo Fijo"> Plazo Fijo
+            </label>
+            <label class="option-label">
+              <input type="radio" name="contrato" value="Honorarios"> Honorarios
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="checkbox-group">
+            <label class="option-label">
+              <input type="checkbox" id="terminos" name="terminos" value="si"> Acepto los términos y condiciones
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-sample" style="margin-top: 10px;">Enviar Formulario</button>
+      </form>
+    </div>
+
+    <!-- PANEL DE CONTROL Y LOG DE EVENTOS -->
+    <div class="card">
+      <h1>Herramientas de Prueba</h1>
+      <p class="subtitle">Copia rápidamente una fila con formato Excel o limpia los campos.</p>
+
+      <button id="btn-copy-sample-1" class="btn-sample">
+        📋 Copiar Fila Ejemplo 1 (Juan Pérez)
+      </button>
+
+      <button id="btn-copy-sample-2" class="btn-sample" style="background:#4f46e5;">
+        📋 Copiar Fila Ejemplo 2 (María Soto)
+      </button>
+
+      <button id="btn-clear-form" class="btn-reset" style="margin-bottom: 20px;">
+        🧹 Limpiar formulario
+      </button>
+
+      <label>Estructura de la fila de ejemplo:</label>
+      <div class="sample-data-box">
+        <code>Col 1: RUT
+Col 2: Nombre
+Col 3: Apellido
+Col 4: Email
+Col 5: Teléfono
+Col 6: Fecha (DD/MM/YYYY)
+Col 7: Sexo (Masculino/Femenino)
+Col 8: Observaciones
+Col 9: Términos (si/no)
+Col 10: Contrato (Indefinido/Honorarios)</code>
+      </div>
+
+      <label>Registro de eventos disparados:</label>
+      <div id="log-box" class="log-box">
+        <div class="log-entry">Esperando interacción con campos...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Filas de ejemplo separadas por tabulaciones (\t) como las copia Excel
+    const sampleRow1 = "12.345.678-9\tJuan\tPérez\tjuan.perez@empresa.cl\t912345678\t20/08/1990\tMasculino\tEmpleado destacado del mes\tsi\tIndefinido";
+    const sampleRow2 = "18.765.432-1\tMaría\tSoto\tmaria.soto@empresa.cl\t987654321\t15/03/1995\tFemenino\tPostulante recomendada\tsi\tPlazo Fijo";
+
+    const logBox = document.getElementById('log-box');
+
+    function logEvent(elementName, eventType, value) {
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      const time = new Date().toLocaleTimeString();
+      entry.innerHTML = `<span class="log-time">[${time}]</span> <strong>${elementName}</strong>: evento <em>${eventType}</em> → "${value}"`;
+      logBox.prepend(entry);
+    }
+
+    // Escuchar eventos en todos los inputs para verificar que el llenado dispara reactividad
+    document.querySelectorAll('input, select, textarea').forEach(el => {
+      ['input', 'change'].forEach(evtType => {
+        el.addEventListener(evtType, (e) => {
+          let val = e.target.type === 'checkbox' ? (e.target.checked ? 'Checked' : 'Unchecked') : e.target.value;
+          const identifier = e.target.id || e.target.name || e.target.tagName;
+          logEvent(identifier, evtType, val);
+        });
+      });
+    });
+
+    document.getElementById('btn-copy-sample-1').addEventListener('click', async () => {
+      await navigator.clipboard.writeText(sampleRow1);
+      alert('✓ Fila 1 de Juan Pérez copiada al portapapeles con formato Excel (TSV). ¡Ahora abre la extensión y presiona RELLENAR!');
+    });
+
+    document.getElementById('btn-copy-sample-2').addEventListener('click', async () => {
+      await navigator.clipboard.writeText(sampleRow2);
+      alert('✓ Fila 2 de María Soto copiada al portapapeles con formato Excel (TSV). ¡Ahora abre la extensión y presiona RELLENAR!');
+    });
+
+    document.getElementById('btn-clear-form').addEventListener('click', () => {
+      document.getElementById('test-form').reset();
+      logBox.innerHTML = '<div class="log-entry">Formulario limpiado.</div>';
+    });
+  </script>
+</body>
+</html>
