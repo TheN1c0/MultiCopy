@@ -143,7 +143,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     clipboardStatusDot.className = 'status-dot dot-gray';
     clipboardStatusText.textContent = 'Leyendo portapapeles...';
 
-    const text = await ClipboardParser.readClipboard();
+    try {
+      const text = await ClipboardParser.readClipboard();
+      handleRawClipboardText(text);
+    } catch (err) {
+      console.warn('Error leyendo portapapeles:', err);
+      clipboardStatusDot.className = 'status-dot dot-gray';
+      clipboardStatusText.textContent = 'Haz clic en "Actualizar" o pega con Ctrl+V';
+    }
+  }
+
+  function handleRawClipboardText(text) {
     clipboardData = ClipboardParser.parseExcelText(text);
 
     if (clipboardData.columns.length === 0) {
@@ -513,6 +523,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     btnRefreshClipboard.addEventListener('click', refreshClipboardState);
+    
+    // Permitir pegar directamente con Ctrl+V en el popup
+    document.addEventListener('paste', (e) => {
+      const text = e.clipboardData?.getData('text') || '';
+      if (text) {
+        handleRawClipboardText(text);
+      }
+    });
+
     btnFillForm.addEventListener('click', handleFillForm);
     btnCreateProfile.addEventListener('click', handleCreateProfile);
 
