@@ -68,7 +68,7 @@ const ElementPicker = {
     
     this.bannerEl.innerHTML = `
       <span class="multicopy-badge">MultiCopy</span>
-      <span>Haz clic en el campo para: <span class="multicopy-target-info">${label}</span></span>
+      <span>Haz clic en el campo que quieres rellenar: <span class="multicopy-target-info">${label}</span></span>
       <button class="multicopy-cancel-btn" id="multicopy-cancel-pick">Cancelar (ESC)</button>
     `;
 
@@ -77,7 +77,7 @@ const ElementPicker = {
     document.getElementById('multicopy-cancel-pick')?.addEventListener('click', (e) => {
       e.stopPropagation();
       this.stop();
-      this.showToast('Selección visual cancelada');
+      this.showToast('Elección de campo cancelada');
       this.requestReopenPopup();
     });
   },
@@ -115,12 +115,12 @@ const ElementPicker = {
       this.highlightedElement.classList.add('multicopy-highlight-hover');
     }
 
-    // Actualizar tooltip
+    // Actualizar tooltip con indicación clara
     if (this.tooltipEl) {
       const friendlyName = SelectorGenerator.getFriendlyName(target);
-      this.tooltipEl.innerText = `${target.tagName.toLowerCase()} → ${friendlyName}`;
+      this.tooltipEl.innerText = `👉 Haz clic para elegir: "${friendlyName}"`;
       this.tooltipEl.style.display = 'block';
-      this.tooltipEl.style.left = `${Math.min(e.clientX + 15, window.innerWidth - 180)}px`;
+      this.tooltipEl.style.left = `${Math.min(e.clientX + 15, window.innerWidth - 220)}px`;
       this.tooltipEl.style.top = `${e.clientY + 15}px`;
     }
   },
@@ -152,7 +152,7 @@ const ElementPicker = {
     const webFieldName = SelectorGenerator.getFriendlyName(target);
 
     if (!selector) {
-      this.showToast('No se pudo generar un selector válido para este elemento', true);
+      this.showToast('No se pudo identificar este elemento en la página', true);
       this.stop();
       this.requestReopenPopup();
       return;
@@ -168,7 +168,7 @@ const ElementPicker = {
         selector: selector
       });
 
-      this.showToast(`✓ Campo vinculado: "${webFieldName}" → Selector guardado`);
+      this.showToast(`✓ Campo elegido: "${webFieldName}" vinculado a "${ctx.fieldName || 'Columna ' + (ctx.columnIndex + 1)}"`);
     }
 
     this.stop();
@@ -178,7 +178,7 @@ const ElementPicker = {
   onKeyDown(e) {
     if (e.key === 'Escape') {
       this.stop();
-      this.showToast('Selección visual cancelada');
+      this.showToast('Elección de campo cancelada');
       this.requestReopenPopup();
     }
   },

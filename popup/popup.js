@@ -406,17 +406,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const colNum = (parseInt(field.columnIndex, 10) || 0) + 1;
       const statusBadge = field.selector 
-        ? '<span style="color:var(--success); font-weight: 600;">✓ Asignado</span>' 
-        : '<span style="color:var(--warning); font-weight: 600;">Sin selector</span>';
+        ? '<span style="color:var(--success); font-weight: 600;">✓ Vinculado</span>' 
+        : '<span style="color:var(--warning); font-weight: 600;">Sin vincular</span>';
 
       card.innerHTML = `
         <div class="list-item-info">
           <span class="list-item-title">${field.name || `Campo ${idx + 1}`}</span>
           <span class="list-item-sub">Columna Excel: <strong>${colNum}</strong> • ${statusBadge}</span>
-          <span class="list-item-sub" style="font-family: monospace; font-size: 10px; color: var(--text-muted);">${field.selector || 'Ninguno'}</span>
+          <span class="list-item-sub" style="font-family: monospace; font-size: 10px; color: var(--text-muted);">${field.selector || 'Sin asignar'}</span>
         </div>
         <div class="list-item-actions">
-          <button class="btn-accent btn-sm btn-pill btn-pick-row" data-id="${field.id}" title="Seleccionar en la página">
+          <button class="btn-accent btn-sm btn-pill btn-pick-row" data-id="${field.id}" title="Elegir campo en la página">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="22" y1="12" x2="18" y2="12"></line><line x1="6" y1="12" x2="2" y2="12"></line><line x1="12" y1="6" x2="12" y2="2"></line><line x1="12" y1="22" x2="12" y2="18"></line></svg>
           </button>
           <button class="btn-secondary btn-sm btn-pill btn-edit-field" data-id="${field.id}" title="Editar">

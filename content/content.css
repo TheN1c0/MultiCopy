@@ -64,11 +64,12 @@
 
 /* Resaltado del elemento bajo el cursor */
 .multicopy-highlight-hover {
-  outline: 2px solid #2b2927 !important;
+  outline: 2.5px solid #2b2927 !important;
   outline-offset: 2px !important;
-  background-color: rgba(243, 233, 169, 0.35) !important;
-  cursor: crosshair !important;
+  background-color: rgba(243, 233, 169, 0.45) !important;
+  cursor: pointer !important;
   border-radius: 4px !important;
+  box-shadow: 0 0 0 4px rgba(243, 233, 169, 0.45) !important;
   transition: outline 0.1s ease, background-color 0.1s ease !important;
 }
 
@@ -78,12 +79,13 @@
   z-index: 2147483646 !important;
   background: #2b2927 !important;
   color: #faf8f5 !important;
-  padding: 4px 8px !important;
-  border-radius: 4px !important;
+  padding: 5px 10px !important;
+  border-radius: 6px !important;
   font-family: 'JetBrains Mono', monospace !important;
-  font-size: 10px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
   pointer-events: none !important;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2) !important;
   display: none;
 }
 
