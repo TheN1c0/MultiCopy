@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const btnConfigCurrentProfile = document.getElementById('btn-config-current-profile');
   const btnManageProfiles = document.getElementById('btn-manage-profiles');
   const btnRefreshClipboard = document.getElementById('btn-refresh-clipboard');
+  const btnPasteClipboard = document.getElementById('btn-paste-clipboard');
   const clipboardStatusDot = document.getElementById('clipboard-status-dot');
   const clipboardStatusText = document.getElementById('clipboard-status-text');
   const clipboardWarning = document.getElementById('clipboard-warning');
@@ -523,6 +524,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     btnRefreshClipboard.addEventListener('click', refreshClipboardState);
+    if (btnPasteClipboard) {
+      btnPasteClipboard.addEventListener('click', refreshClipboardState);
+    }
     
     // Permitir pegar directamente con Ctrl+V en el popup
     document.addEventListener('paste', (e) => {

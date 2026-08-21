@@ -5,19 +5,31 @@
 
 const ClipboardParser = {
   /**
-   * Lee el texto del portapapeles
+   * Lee el texto del portapapeles de manera segura
    * @returns {Promise<string>}
    */
   async readClipboard() {
     try {
-      if (navigator.clipboard && navigator.clipboard.readText) {
-        return await navigator.clipboard.readText();
+      if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.readText) {
+        const text = await navigator.clipboard.readText();
+        return text || '';
       }
-      return '';
     } catch (err) {
-      console.warn('MultiCopy: No se pudo leer el portapapeles directamente:', err);
-      return '';
+      // Document is not focused yet or user gesture needed
+      // Intentar método alternativo mediante input temporal si es necesario
+      try {
+        const textarea = document.createElement('textarea');
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        const success = document.execCommand('paste');
+        const val = textarea.value;
+        textarea.remove();
+        if (success && val) return val;
+      } catch (_) {}
     }
+    return '';
   },
 
   /**
