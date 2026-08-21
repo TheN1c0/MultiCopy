@@ -259,7 +259,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function resetFillButton() {
     btnFillForm.disabled = false;
-    btnFillForm.innerHTML = '<span class="btn-icon">⚡</span> RELLENAR FORMULARIO';
+    btnFillForm.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> RELLENAR FORMULARIO';
   }
 
   function showFeedback(msg, isError = false) {
@@ -302,12 +302,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       card.innerHTML = `
         <div class="list-item-info">
-          <span class="list-item-title">${p.name} ${isActive ? '⚡ (Activo)' : ''}</span>
+          <span class="list-item-title">${p.name} ${isActive ? '<span class="badge" style="margin-left: 6px;">Activo</span>' : ''}</span>
           <span class="list-item-sub">${fieldCount} campos configurados ${p.domain ? `• ${p.domain}` : ''}</span>
         </div>
         <div class="list-item-actions">
-          <button class="btn-secondary btn-sm btn-edit-profile" data-id="${p.id}" title="Configurar campos">⚙️ Campos</button>
-          <button class="btn-danger-ghost btn-sm btn-delete-profile" data-id="${p.id}" title="Eliminar">🗑️</button>
+          <button class="btn-secondary btn-sm btn-pill btn-edit-profile" data-id="${p.id}" title="Configurar campos">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            Campos
+          </button>
+          <button class="btn-danger-ghost btn-sm btn-delete-profile" data-id="${p.id}" title="Eliminar perfil">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+          </button>
         </div>
       `;
 
@@ -375,8 +380,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const colNum = (parseInt(field.columnIndex, 10) || 0) + 1;
       const statusBadge = field.selector 
-        ? '<span style="color:var(--success)">✓ Selector asignado</span>' 
-        : '<span style="color:var(--warning)">⚠️ Sin selector</span>';
+        ? '<span style="color:var(--success); font-weight: 600;">✓ Asignado</span>' 
+        : '<span style="color:var(--warning); font-weight: 600;">Sin selector</span>';
 
       card.innerHTML = `
         <div class="list-item-info">
@@ -385,9 +390,15 @@ document.addEventListener('DOMContentLoaded', async () => {
           <span class="list-item-sub" style="font-family: monospace; font-size: 10px; color: var(--text-muted);">${field.selector || 'Ninguno'}</span>
         </div>
         <div class="list-item-actions">
-          <button class="btn-accent btn-sm btn-pick-row" data-id="${field.id}" title="Seleccionar en la página">🎯</button>
-          <button class="btn-secondary btn-sm btn-edit-field" data-id="${field.id}" title="Editar">✏️</button>
-          <button class="btn-danger-ghost btn-sm btn-delete-field" data-id="${field.id}" title="Eliminar">🗑️</button>
+          <button class="btn-accent btn-sm btn-pill btn-pick-row" data-id="${field.id}" title="Seleccionar en la página">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="22" y1="12" x2="18" y2="12"></line><line x1="6" y1="12" x2="2" y2="12"></line><line x1="12" y1="6" x2="12" y2="2"></line><line x1="12" y1="22" x2="12" y2="18"></line></svg>
+          </button>
+          <button class="btn-secondary btn-sm btn-pill btn-edit-field" data-id="${field.id}" title="Editar">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          </button>
+          <button class="btn-danger-ghost btn-sm btn-delete-field" data-id="${field.id}" title="Eliminar">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+          </button>
         </div>
       `;
 

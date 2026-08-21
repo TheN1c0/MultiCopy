@@ -3,17 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Página de Prueba - MultiCopy</title>
+  <title>Página de Prueba - MultiCopy (BravoBytes)</title>
   <style>
     :root {
-      --bg: #0f172a;
-      --card-bg: #1e293b;
-      --border: #334155;
+      --bg: #101c2c;
+      --card-bg: #19273b;
+      --card-inner: #0d1724;
+      --border: rgba(255, 255, 255, 0.08);
       --text: #f8fafc;
       --text-muted: #94a3b8;
-      --primary: #38bdf8;
-      --primary-hover: #0284c7;
+      --accent-cyan: #00b4d8;
+      --accent-gradient: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+      --accent-gradient-purple: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+      --pill-bg: rgba(35, 52, 77, 0.85);
+      --pill-border: rgba(148, 163, 184, 0.25);
       --success: #10b981;
+      --radius-pill: 9999px;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
     }
 
     * {
@@ -23,19 +31,20 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: var(--bg) radial-gradient(circle at 50% 0%, #192b42 0%, #101c2c 70%);
       color: var(--text);
+      min-height: 100vh;
       padding: 40px 20px;
       display: flex;
       justify-content: center;
     }
 
     .container {
-      max-width: 850px;
+      max-width: 900px;
       width: 100%;
       display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
+      grid-template-columns: 1.25fr 0.85fr;
       gap: 24px;
     }
 
@@ -48,21 +57,40 @@
     .card {
       background: var(--card-bg);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 24px;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+      border-radius: var(--radius-lg);
+      padding: 26px;
+      box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.4);
+    }
+
+    .brand-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 180, 216, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(0, 180, 216, 0.3);
+      padding: 3px 10px;
+      border-radius: var(--radius-pill);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
     }
 
     h1 {
-      font-size: 20px;
+      font-size: 22px;
+      font-weight: 800;
       margin-bottom: 8px;
-      color: var(--text);
+      color: #fff;
+      letter-spacing: -0.3px;
     }
 
     .subtitle {
       font-size: 13px;
       color: var(--text-muted);
-      margin-bottom: 20px;
+      margin-bottom: 22px;
+      line-height: 1.5;
     }
 
     .form-group {
@@ -71,8 +99,8 @@
 
     label {
       display: block;
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 11px;
+      font-weight: 700;
       margin-bottom: 6px;
       color: var(--text-muted);
       text-transform: uppercase;
@@ -81,19 +109,25 @@
 
     .form-control {
       width: 100%;
-      background: #0b1120;
+      background: var(--card-inner);
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: var(--radius-md);
       color: var(--text);
-      padding: 10px 12px;
-      font-size: 14px;
+      padding: 10px 14px;
+      font-size: 13px;
       outline: none;
       transition: all 0.15s ease;
     }
 
     .form-control:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 2px rgba(0, 180, 216, 0.25);
+    }
+
+    select.form-control {
+      border-radius: var(--radius-pill);
+      padding-left: 16px;
+      cursor: pointer;
     }
 
     .form-row {
@@ -104,7 +138,8 @@
 
     textarea.form-control {
       resize: vertical;
-      min-height: 70px;
+      min-height: 75px;
+      border-radius: var(--radius-md);
     }
 
     .radio-group, .checkbox-group {
@@ -117,65 +152,81 @@
     .option-label {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       font-size: 13px;
       text-transform: none;
-      font-weight: normal;
+      font-weight: 500;
       color: var(--text);
       cursor: pointer;
     }
 
-    .btn-sample {
-      background: #0284c7;
-      color: #fff;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 6px;
-      font-weight: 600;
+    .btn {
+      font-family: inherit;
       font-size: 13px;
+      font-weight: 700;
+      border: none;
+      padding: 11px 18px;
+      border-radius: var(--radius-pill);
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
       width: 100%;
       margin-bottom: 12px;
-      transition: background 0.15s;
+      transition: all 0.18s ease;
     }
 
-    .btn-sample:hover {
-      background: #0369a1;
-    }
-
-    .btn-reset {
-      background: transparent;
-      color: var(--text-muted);
-      border: 1px solid var(--border);
-      padding: 8px 14px;
-      border-radius: 6px;
-      font-size: 12px;
-      cursor: pointer;
-      width: 100%;
-    }
-
-    .btn-reset:hover {
+    .btn-primary {
+      background: var(--accent-gradient);
       color: #fff;
-      border-color: #475569;
+      box-shadow: 0 4px 14px rgba(0, 180, 216, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(0, 180, 216, 0.45);
+    }
+
+    .btn-purple {
+      background: var(--accent-gradient-purple);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-purple:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(99, 102, 241, 0.45);
+    }
+
+    .btn-secondary {
+      background: var(--pill-bg);
+      color: var(--text);
+      border: 1px solid var(--pill-border);
+    }
+
+    .btn-secondary:hover {
+      background: #23344d;
+      border-color: rgba(255, 255, 255, 0.2);
     }
 
     /* Event log */
     .log-box {
-      background: #0b1120;
+      background: var(--card-inner);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px;
+      border-radius: var(--radius-md);
+      padding: 14px;
       height: 280px;
       overflow-y: auto;
       font-family: monospace;
       font-size: 11px;
-      color: #38bdf8;
+      color: var(--accent-cyan);
     }
 
     .log-entry {
-      margin-bottom: 4px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      padding-bottom: 3px;
+      margin-bottom: 5px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      padding-bottom: 4px;
     }
 
     .log-time {
@@ -183,10 +234,10 @@
     }
 
     .sample-data-box {
-      background: #0b1120;
+      background: var(--card-inner);
       border: 1px dashed var(--border);
-      padding: 12px;
-      border-radius: 6px;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
       font-size: 12px;
       color: var(--text-muted);
       margin-bottom: 16px;
@@ -194,7 +245,7 @@
     }
 
     .sample-data-box code {
-      color: #38bdf8;
+      color: var(--accent-cyan);
       white-space: pre;
     }
   </style>
@@ -204,44 +255,45 @@
   <div class="container">
     <!-- FORMULARIO DE PRUEBA -->
     <div class="card">
+      <span class="brand-tag">BravoBytes Form Testing</span>
       <h1>Formulario de Prueba</h1>
-      <p class="subtitle">Utiliza este formulario para probar la selección visual y el autocompletado de MultiCopy.</p>
+      <p class="subtitle">Prueba la selección visual y el autocompletado reactivo de MultiCopy.</p>
 
       <form id="test-form" onsubmit="event.preventDefault(); alert('Formulario enviado!');">
         <div class="form-row">
           <div class="form-group">
-            <label for="rut">RUT:</label>
+            <label for="rut">RUT</label>
             <input type="text" id="rut" name="rut" class="form-control" placeholder="12.345.678-9">
           </div>
           <div class="form-group">
-            <label for="telefono">Teléfono:</label>
+            <label for="telefono">Teléfono</label>
             <input type="tel" id="telefono" name="telefono" class="form-control" placeholder="912345678">
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="nombre">Nombre:</label>
+            <label for="nombre">Nombre</label>
             <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Juan">
           </div>
           <div class="form-group">
-            <label for="apellido">Apellido:</label>
+            <label for="apellido">Apellido</label>
             <input type="text" id="apellido" name="apellido" class="form-control" placeholder="Pérez">
           </div>
         </div>
 
         <div class="form-group">
-          <label for="email">Correo Electrónico:</label>
+          <label for="email">Correo Electrónico</label>
           <input type="email" id="email" name="email" class="form-control" placeholder="juan@email.com">
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="fecha_nacimiento">Fecha de Nacimiento:</label>
+            <label for="fecha_nacimiento">Fecha de Nacimiento</label>
             <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" class="form-control">
           </div>
           <div class="form-group">
-            <label for="sexo">Sexo / Género:</label>
+            <label for="sexo">Sexo / Género</label>
             <select id="sexo" name="sexo" class="form-control">
               <option value="">Seleccione una opción...</option>
               <option value="M">Masculino</option>
@@ -253,12 +305,12 @@
         </div>
 
         <div class="form-group">
-          <label for="observaciones">Observaciones / Comentarios:</label>
+          <label for="observaciones">Observaciones / Comentarios</label>
           <textarea id="observaciones" name="observaciones" class="form-control" placeholder="Observaciones adicionales..."></textarea>
         </div>
 
         <div class="form-group">
-          <label>Tipo de Contrato:</label>
+          <label>Tipo de Contrato</label>
           <div class="radio-group">
             <label class="option-label">
               <input type="radio" name="contrato" value="Indefinido"> Indefinido
@@ -280,28 +332,35 @@
           </div>
         </div>
 
-        <button type="submit" class="btn-sample" style="margin-top: 10px;">Enviar Formulario</button>
+        <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          Enviar Formulario
+        </button>
       </form>
     </div>
 
     <!-- PANEL DE CONTROL Y LOG DE EVENTOS -->
     <div class="card">
-      <h1>Herramientas de Prueba</h1>
-      <p class="subtitle">Copia rápidamente una fila con formato Excel o limpia los campos.</p>
+      <span class="brand-tag">Portapapeles TSV</span>
+      <h1>Datos de Ejemplo</h1>
+      <p class="subtitle">Copia filas con formato nativo de Excel al portapapeles.</p>
 
-      <button id="btn-copy-sample-1" class="btn-sample">
-        📋 Copiar Fila Ejemplo 1 (Juan Pérez)
+      <button id="btn-copy-sample-1" class="btn btn-primary">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+        Copiar Fila 1 (Juan Pérez)
       </button>
 
-      <button id="btn-copy-sample-2" class="btn-sample" style="background:#4f46e5;">
-        📋 Copiar Fila Ejemplo 2 (María Soto)
+      <button id="btn-copy-sample-2" class="btn btn-purple">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+        Copiar Fila 2 (María Soto)
       </button>
 
-      <button id="btn-clear-form" class="btn-reset" style="margin-bottom: 20px;">
-        🧹 Limpiar formulario
+      <button id="btn-clear-form" class="btn btn-secondary" style="margin-bottom: 20px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        Limpiar formulario
       </button>
 
-      <label>Estructura de la fila de ejemplo:</label>
+      <label>Estructura de la fila de ejemplo</label>
       <div class="sample-data-box">
         <code>Col 1: RUT
 Col 2: Nombre
@@ -315,7 +374,7 @@ Col 9: Términos (si/no)
 Col 10: Contrato (Indefinido/Honorarios)</code>
       </div>
 
-      <label>Registro de eventos disparados:</label>
+      <label>Registro de eventos disparados</label>
       <div id="log-box" class="log-box">
         <div class="log-entry">Esperando interacción con campos...</div>
       </div>
@@ -350,12 +409,12 @@ Col 10: Contrato (Indefinido/Honorarios)</code>
 
     document.getElementById('btn-copy-sample-1').addEventListener('click', async () => {
       await navigator.clipboard.writeText(sampleRow1);
-      alert('✓ Fila 1 de Juan Pérez copiada al portapapeles con formato Excel (TSV). ¡Ahora abre la extensión y presiona RELLENAR!');
+      alert('✓ Fila 1 (Juan Pérez) copiada al portapapeles con formato Excel.');
     });
 
     document.getElementById('btn-copy-sample-2').addEventListener('click', async () => {
       await navigator.clipboard.writeText(sampleRow2);
-      alert('✓ Fila 2 de María Soto copiada al portapapeles con formato Excel (TSV). ¡Ahora abre la extensión y presiona RELLENAR!');
+      alert('✓ Fila 2 (María Soto) copiada al portapapeles con formato Excel.');
     });
 
     document.getElementById('btn-clear-form').addEventListener('click', () => {
