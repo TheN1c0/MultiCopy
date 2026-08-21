@@ -47,21 +47,22 @@ function fillFormFields(fields, columns) {
   fields.forEach(field => {
     const colIndex = parseInt(field.columnIndex, 10);
     const value = columns[colIndex];
+    const fieldName = field.name || `Columna ${colIndex + 1}`;
 
-    if (value === undefined || value === null) {
-      errors.push(`Columna ${colIndex + 1} no encontrada en los datos de Excel`);
+    if (value === undefined || value === null || String(value).trim() === '') {
+      errors.push(`"${fieldName}": La columna ${colIndex + 1} de Excel está vacía`);
       return;
     }
 
     if (!field.selector) {
-      errors.push(`Campo "${field.name || 'Sin nombre'}" no tiene selector asignado`);
+      errors.push(`"${fieldName}": No tiene selector asignado`);
       return;
     }
 
     try {
       const element = document.querySelector(field.selector);
       if (!element) {
-        errors.push(`No se encontró el elemento en la página con selector: ${field.selector}`);
+        errors.push(`"${fieldName}": No se encontró en la página (selector: ${field.selector})`);
         return;
       }
 
@@ -69,17 +70,21 @@ function fillFormFields(fields, columns) {
       if (success) {
         filledCount++;
       } else {
-        errors.push(`No se pudo rellenar el campo "${field.name || field.selector}"`);
+        errors.push(`"${fieldName}": No se pudo rellenar con el valor "${value}"`);
       }
     } catch (err) {
-      errors.push(`Error en campo "${field.name}": ${err.message}`);
+      errors.push(`"${fieldName}": ${err.message}`);
     }
   });
 
-  if (filledCount > 0) {
-    ElementPicker.showToast(`✓ MultiCopy: Se rellenaron ${filledCount} de ${fields.length} campos`);
+  if (filledCount === fields.length) {
+    ElementPicker.showToast(`✓ MultiCopy: Se rellenaron los ${filledCount} campos con éxito`);
+  } else if (filledCount > 0) {
+    const firstError = errors[0] || '';
+    ElementPicker.showToast(`⚠️ MultiCopy: Se rellenaron ${filledCount} de ${fields.length} campos. (${firstError})`, true);
   } else {
-    ElementPicker.showToast(`⚠️ MultiCopy: No se pudo rellenar ningún campo`, true);
+    const firstError = errors[0] || 'Revisa la correspondencia de columnas con el formulario';
+    ElementPicker.showToast(`⚠️ MultiCopy: ${firstError}`, true);
   }
 
   return {

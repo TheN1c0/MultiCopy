@@ -252,8 +252,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (chrome.runtime.lastError) {
           showFeedback('Error: La página no permite inyección o necesita ser recargada', true);
         } else if (response && response.results) {
-          const { filled, total } = response.results;
-          showFeedback(`✓ ¡Éxito! Se rellenaron ${filled} de ${total} campos.`);
+          const { filled, total, errors } = response.results;
+          if (errors && errors.length > 0) {
+            if (filled > 0) {
+              showFeedback(`⚠️ ${filled}/${total} rellenos. (${errors[0]})`, true);
+            } else {
+              showFeedback(`⚠️ Error: ${errors[0]}`, true);
+            }
+          } else {
+            showFeedback(`✓ ¡Éxito! Se rellenaron los ${filled} campos.`);
+          }
         }
         resetFillButton();
       });

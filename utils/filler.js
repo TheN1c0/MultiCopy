@@ -1,7 +1,7 @@
 /**
  * MultiCopy - DOM Form Filler Module
  * Rellena campos HTML de manera compatible con frameworks modernos (React, Vue, Angular)
- * disparando eventos y utilizando setters nativos.
+ * disparando eventos y utilizando setters nativos, con manejo amigable de errores.
  */
 
 const FormFiller = {
@@ -18,50 +18,82 @@ const FormFiller = {
     const type = (element.type || '').toLowerCase();
     const strVal = String(value).trim();
 
-    try {
-      // 1. SELECT
-      if (tag === 'select') {
-        return this.fillSelect(element, strVal);
+    // 1. SELECT
+    if (tag === 'select') {
+      return this.fillSelect(element, strVal);
+    }
+
+    // 2. CHECKBOX
+    if (tag === 'input' && type === 'checkbox') {
+      return this.fillCheckbox(element, strVal);
+    }
+
+    // 3. RADIO BUTTON
+    if (tag === 'input' && type === 'radio') {
+      return this.fillRadio(element, strVal);
+    }
+
+    // 4. DATE INPUT
+    if (tag === 'input' && type === 'date') {
+      const formattedDate = this.formatDateForInput(strVal);
+      if (!formattedDate) {
+        throw new Error(`El campo es de tipo fecha, pero en Excel dice "${strVal}". Verifica que la columna corresponda a una fecha.`);
+      }
+      return this.setNativeValue(element, formattedDate);
+    }
+
+    // 5. TEXTAREA
+    if (tag === 'textarea') {
+      return this.setNativeValue(element, strVal);
+    }
+
+    // 6. INPUT (text, email, number, tel, url, search, password, etc.)
+    if (tag === 'input') {
+      return this.setNativeValue(element, strVal);
+    }
+
+    // 7. CONTENEDOR (DIV, FIELDSET, etc.) que envuelve radios o inputs
+    if (tag === 'div' || tag === 'fieldset' || tag === 'section') {
+      // Si contiene radio buttons
+      const radios = element.querySelectorAll('input[type="radio"]');
+      if (radios.length > 0) {
+        return this.fillRadioInGroup(radios, strVal);
       }
 
-      // 2. CHECKBOX
-      if (tag === 'input' && type === 'checkbox') {
-        return this.fillCheckbox(element, strVal);
+      // Si contiene un select
+      const select = element.querySelector('select');
+      if (select) {
+        return this.fillSelect(select, strVal);
       }
 
-      // 3. RADIO BUTTON
-      if (tag === 'input' && type === 'radio') {
-        return this.fillRadio(element, strVal);
+      // Si contiene un checkbox
+      const checkbox = element.querySelector('input[type="checkbox"]');
+      if (checkbox) {
+        return this.fillCheckbox(checkbox, strVal);
       }
 
-      // 4. DATE INPUT
-      if (tag === 'input' && type === 'date') {
-        const formattedDate = this.formatDateForInput(strVal);
-        return this.setNativeValue(element, formattedDate);
+      // Si contiene un input estándar
+      const input = element.querySelector('input, textarea');
+      if (input) {
+        return this.fillElement(input, strVal);
       }
 
-      // 5. TEXTAREA
-      if (tag === 'textarea') {
-        return this.setNativeValue(element, strVal);
-      }
-
-      // 6. INPUT (text, email, number, tel, url, search, password, etc.)
-      if (tag === 'input') {
-        return this.setNativeValue(element, strVal);
-      }
-
-      // Si es un div contenteditable
+      // Si es un div editable (contenteditable)
       if (element.isContentEditable) {
         element.innerText = strVal;
         this.dispatchEvents(element);
         return true;
       }
-
-      return false;
-    } catch (err) {
-      console.error('MultiCopy: Error al rellenar elemento:', err, element);
-      return false;
     }
+
+    // 8. Elemento contenteditable directo
+    if (element.isContentEditable) {
+      element.innerText = strVal;
+      this.dispatchEvents(element);
+      return true;
+    }
+
+    return false;
   },
 
   /**
@@ -69,36 +101,46 @@ const FormFiller = {
    * para asegurar que React / Vue / Angular detecten el cambio.
    */
   setNativeValue(element, value) {
-    const proto = element.tagName.toLowerCase() === 'textarea' 
-      ? window.HTMLTextAreaElement.prototype 
-      : window.HTMLInputElement.prototype;
+    try {
+      const proto = element.tagName.toLowerCase() === 'textarea' 
+        ? window.HTMLTextAreaElement.prototype 
+        : window.HTMLInputElement.prototype;
 
-    const descriptor = Object.getOwnPropertyDescriptor(proto, 'value');
-    if (descriptor && descriptor.set) {
-      descriptor.set.call(element, value);
-    } else {
-      element.value = value;
+      const descriptor = Object.getOwnPropertyDescriptor(proto, 'value');
+      if (descriptor && descriptor.set) {
+        descriptor.set.call(element, value);
+      } else {
+        element.value = value;
+      }
+
+      this.dispatchEvents(element);
+      return true;
+    } catch (err) {
+      throw new Error(`No se pudo asignar el valor "${value}": ${err.message}`);
     }
-
-    this.dispatchEvents(element);
-    return true;
   },
 
   /**
    * Dispara los eventos necesarios en orden para frameworks modernos
    */
   dispatchEvents(element) {
-    element.dispatchEvent(new Event('focus', { bubbles: true }));
-    element.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
-    element.dispatchEvent(new Event('change', { bubbles: true }));
-    element.dispatchEvent(new Event('blur', { bubbles: true }));
+    try {
+      element.dispatchEvent(new Event('focus', { bubbles: true }));
+      element.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
+      element.dispatchEvent(new Event('change', { bubbles: true }));
+      element.dispatchEvent(new Event('blur', { bubbles: true }));
+    } catch (e) {
+      // Ignorar errores menores de dispatch si el elemento fue desmontado
+    }
   },
 
   /**
    * Maneja el rellenado de elementos <select>
    */
   fillSelect(selectElement, value) {
-    if (!selectElement.options || selectElement.options.length === 0) return false;
+    if (!selectElement.options || selectElement.options.length === 0) {
+      throw new Error('El menú desplegable no contiene opciones.');
+    }
 
     const targetNormalized = this.normalizeText(value);
     let matchedOption = null;
@@ -147,7 +189,13 @@ const FormFiller = {
       return true;
     }
 
-    return false;
+    const previewOpts = Array.from(selectElement.options)
+      .map(o => `"${o.text.trim()}"`)
+      .filter(t => t.length > 2)
+      .slice(0, 3)
+      .join(', ');
+
+    throw new Error(`En Excel dice "${value}", pero esa opción no existe en el selector web (Opciones válidas: ${previewOpts}...)`);
   },
 
   /**
@@ -173,57 +221,74 @@ const FormFiller = {
       return true;
     }
 
-    return false;
+    throw new Error(`En Excel dice "${value}", que no es reconocible como Sí/No para la casilla.`);
   },
 
   /**
-   * Maneja radio buttons
+   * Maneja radio buttons desde un elemento <input type="radio">
    */
   fillRadio(radioElement, value) {
-    const norm = this.normalizeText(value);
     const radioName = radioElement.name;
-
     if (radioName) {
       const group = document.querySelectorAll(`input[type="radio"][name="${CSS.escape(radioName)}"]`);
-      for (const radio of group) {
-        const valNorm = this.normalizeText(radio.value);
-        let labelNorm = '';
-        if (radio.id) {
-          const lbl = document.querySelector(`label[for="${CSS.escape(radio.id)}"]`);
-          if (lbl) labelNorm = this.normalizeText(lbl.innerText);
-        }
-        const parentLabel = radio.closest('label');
-        if (parentLabel) labelNorm = this.normalizeText(parentLabel.innerText);
-
-        if (valNorm === norm || (labelNorm && (labelNorm === norm || labelNorm.includes(norm)))) {
-          const descriptor = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'checked');
-          if (descriptor && descriptor.set) {
-            descriptor.set.call(radio, true);
-          } else {
-            radio.checked = true;
-          }
-          this.dispatchEvents(radio);
-          return true;
-        }
-      }
+      return this.fillRadioInGroup(group, value);
     } else {
-      // Radio individual
+      // Radio individual sin nombre de grupo
+      const norm = this.normalizeText(value);
       const valNorm = this.normalizeText(radioElement.value);
       if (valNorm === norm) {
         radioElement.checked = true;
         this.dispatchEvents(radioElement);
         return true;
       }
+      throw new Error(`No se encontró la opción "${value}" en el radio button.`);
+    }
+  },
+
+  /**
+   * Busca y selecciona la opción correspondiente dentro de un grupo de radio buttons
+   */
+  fillRadioInGroup(radios, value) {
+    const norm = this.normalizeText(value);
+    const availableLabels = [];
+
+    for (const radio of radios) {
+      const valNorm = this.normalizeText(radio.value);
+      let labelText = '';
+      if (radio.id) {
+        const lbl = document.querySelector(`label[for="${CSS.escape(radio.id)}"]`);
+        if (lbl) labelText = lbl.innerText.trim();
+      }
+      const parentLabel = radio.closest('label');
+      if (parentLabel && !labelText) {
+        labelText = parentLabel.innerText.trim();
+      }
+
+      if (labelText) availableLabels.push(`"${labelText}"`);
+      const labelNorm = this.normalizeText(labelText);
+
+      if (valNorm === norm || (labelNorm && (labelNorm === norm || labelNorm.includes(norm) || norm.includes(labelNorm)))) {
+        const descriptor = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'checked');
+        if (descriptor && descriptor.set) {
+          descriptor.set.call(radio, true);
+        } else {
+          radio.checked = true;
+        }
+        this.dispatchEvents(radio);
+        return true;
+      }
     }
 
-    return false;
+    const preview = availableLabels.slice(0, 3).join(', ');
+    throw new Error(`En Excel dice "${value}", pero no coincide con ninguna opción de radio (Opciones disponibles: ${preview || 'ninguna'})`);
   },
 
   /**
    * Normaliza fechas para inputs <input type="date"> (espera formato YYYY-MM-DD)
+   * Si no es una fecha válida, retorna null para no causar errores de formato en el DOM.
    */
   formatDateForInput(strVal) {
-    if (!strVal) return '';
+    if (!strVal) return null;
 
     // Si ya está en formato YYYY-MM-DD
     if (/^\d{4}-\d{2}-\d{2}$/.test(strVal)) {
@@ -248,7 +313,8 @@ const FormFiller = {
       return `${year}-${month}-${day}`;
     }
 
-    return strVal;
+    // Si es un string que no representa una fecha (ej: "Masculino", "Juan")
+    return null;
   },
 
   /**
