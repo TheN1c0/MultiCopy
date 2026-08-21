@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
 
-// Generador de PNG con estética BravoBytes (Navy Blue #101c2c + Cyan #00b4d8)
+// Generador de PNG con estética Lo-Fi Paper & Stamp (#faf8f5 + #2b2927 + #f3e9a9)
 function createPNG(size) {
   const width = size;
   const height = size;
@@ -38,25 +38,24 @@ function createPNG(size) {
 
       if (dist <= outerRadius) {
         if (dist > innerRadius) {
-          // Borde exterior cyan brillante
-          rawData[pxOffset] = 0;       // R
-          rawData[pxOffset + 1] = 180; // G
-          rawData[pxOffset + 2] = 216; // B
+          // Borde sello charcoal oscuro
+          rawData[pxOffset] = 43;      // R
+          rawData[pxOffset + 1] = 41;  // G
+          rawData[pxOffset + 2] = 39;  // B
           rawData[pxOffset + 3] = 255; // A
         } else {
-          // Fondo Navy BravoBytes (#101c2c -> #19273b)
-          const t = (x + y) / (width * 2);
-          rawData[pxOffset] = Math.floor(16 + 20 * t);
-          rawData[pxOffset + 1] = Math.floor(28 + 25 * t);
-          rawData[pxOffset + 2] = Math.floor(44 + 30 * t);
+          // Fondo papel cálido (#faf8f5)
+          rawData[pxOffset] = 250;
+          rawData[pxOffset + 1] = 248;
+          rawData[pxOffset + 2] = 245;
           rawData[pxOffset + 3] = 255;
         }
 
-        // Dibujo de marca central (rayo / capas)
-        if (Math.abs(dx) < width * 0.22 && Math.abs(dy) < height * 0.22) {
-          rawData[pxOffset] = 72;      // R
-          rawData[pxOffset + 1] = 202; // G
-          rawData[pxOffset + 2] = 228; // B
+        // Marca central (nota adhesiva / rayo charcoal)
+        if (Math.abs(dx) < width * 0.20 && Math.abs(dy) < height * 0.20) {
+          rawData[pxOffset] = 43;
+          rawData[pxOffset + 1] = 41;
+          rawData[pxOffset + 2] = 39;
           rawData[pxOffset + 3] = 255;
         }
       } else {
@@ -108,5 +107,5 @@ if (!fs.existsSync(iconsDir)) {
 [16, 48, 128].forEach(size => {
   const pngBuf = createPNG(size);
   fs.writeFileSync(path.join(iconsDir, `icon${size}.png`), pngBuf);
-  console.log(`Icono BravoBytes generado: icon${size}.png (${size}x${size})`);
+  console.log(`Icono Lo-Fi generado: icon${size}.png (${size}x${size})`);
 });

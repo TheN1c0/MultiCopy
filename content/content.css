@@ -1,4 +1,4 @@
-/* MultiCopy - Content Script & Visual Inspector Styles (BravoBytes Theme) */
+/* MultiCopy - Content Script & Visual Inspector Styles (Lo-Fi Paper Theme) */
 
 /* Banner superior del inspector */
 #multicopy-picker-banner {
@@ -7,66 +7,68 @@
   left: 50% !important;
   transform: translateX(-50%) !important;
   z-index: 2147483647 !important;
-  background: rgba(16, 28, 44, 0.95) !important;
-  backdrop-filter: blur(14px) !important;
-  color: #f8fafc !important;
-  padding: 10px 22px !important;
-  border-radius: 9999px !important;
-  box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 180, 216, 0.2) !important;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-  font-size: 13px !important;
+  background: #faf8f5 !important;
+  color: #2b2927 !important;
+  padding: 10px 20px !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 24px rgba(43, 41, 39, 0.15), 0 2px 6px rgba(43, 41, 39, 0.08) !important;
+  font-family: 'JetBrains Mono', 'Courier New', Courier, monospace, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-size: 12px !important;
   font-weight: 500 !important;
   display: flex !important;
   align-items: center !important;
-  gap: 14px !important;
-  border: 1px solid rgba(0, 180, 216, 0.4) !important;
+  gap: 12px !important;
+  border: 1px solid #d8d1c4 !important;
+  border-top: 3px solid #2b2927 !important;
   animation: multicopy-slide-down 0.25s ease-out !important;
   pointer-events: auto !important;
   user-select: none !important;
 }
 
 #multicopy-picker-banner .multicopy-badge {
-  background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%) !important;
-  color: #ffffff !important;
-  padding: 4px 12px !important;
-  border-radius: 9999px !important;
-  font-size: 11px !important;
-  font-weight: 800 !important;
+  background: #f3e9a9 !important;
+  color: #594f13 !important;
+  padding: 3px 10px !important;
+  border-radius: 4px !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
   letter-spacing: 0.5px !important;
   text-transform: uppercase !important;
-  box-shadow: 0 2px 8px rgba(0, 180, 216, 0.4) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
 }
 
 #multicopy-picker-banner .multicopy-target-info {
-  color: #48cae4 !important;
+  color: #1d4359 !important;
   font-weight: 700 !important;
+  background: #b9d5e6 !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
 }
 
 #multicopy-picker-banner .multicopy-cancel-btn {
-  background: rgba(35, 52, 77, 0.85) !important;
-  color: #e2e8f0 !important;
-  border: 1px solid rgba(148, 163, 184, 0.25) !important;
-  padding: 5px 12px !important;
-  border-radius: 9999px !important;
+  background: #f3efe6 !important;
+  color: #635f59 !important;
+  border: 1px solid #d8d1c4 !important;
+  padding: 4px 10px !important;
+  border-radius: 4px !important;
   font-size: 11px !important;
   font-weight: 600 !important;
   cursor: pointer !important;
-  transition: all 0.18s ease !important;
+  transition: all 0.15s ease !important;
 }
 
 #multicopy-picker-banner .multicopy-cancel-btn:hover {
-  background: #23344d !important;
-  color: #ffffff !important;
-  border-color: rgba(255, 255, 255, 0.3) !important;
+  background: #ede8dc !important;
+  color: #2b2927 !important;
 }
 
 /* Resaltado del elemento bajo el cursor */
 .multicopy-highlight-hover {
-  outline: 3px solid #00b4d8 !important;
+  outline: 2px solid #2b2927 !important;
   outline-offset: 2px !important;
-  background-color: rgba(0, 180, 216, 0.15) !important;
+  background-color: rgba(243, 233, 169, 0.35) !important;
   cursor: crosshair !important;
-  border-radius: 6px !important;
+  border-radius: 4px !important;
   transition: outline 0.1s ease, background-color 0.1s ease !important;
 }
 
@@ -74,48 +76,47 @@
 #multicopy-element-tooltip {
   position: fixed !important;
   z-index: 2147483646 !important;
-  background: #19273b !important;
-  color: #f8fafc !important;
-  padding: 5px 10px !important;
-  border-radius: 8px !important;
-  font-family: monospace !important;
-  font-size: 11px !important;
+  background: #2b2927 !important;
+  color: #faf8f5 !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 10px !important;
   pointer-events: none !important;
-  border: 1px solid rgba(0, 180, 216, 0.4) !important;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4) !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
   display: none;
 }
 
 /* Toast de notificación en pantalla */
 #multicopy-toast {
   position: fixed !important;
-  bottom: 28px !important;
-  right: 28px !important;
+  bottom: 24px !important;
+  right: 24px !important;
   z-index: 2147483647 !important;
-  background: #101c2c !important;
-  color: #f8fafc !important;
-  padding: 12px 20px !important;
-  border-radius: 14px !important;
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 180, 216, 0.15) !important;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-  font-size: 13px !important;
+  background: #faf8f5 !important;
+  color: #2b2927 !important;
+  padding: 11px 18px !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 20px rgba(43, 41, 39, 0.12) !important;
+  font-family: 'JetBrains Mono', monospace, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-size: 12px !important;
   font-weight: 600 !important;
   display: flex !important;
   align-items: center !important;
-  gap: 10px !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-left: 4px solid #10b981 !important;
+  gap: 8px !important;
+  border: 1px solid #d8d1c4 !important;
+  border-left: 4px solid #5a8a6e !important;
   animation: multicopy-toast-slide 0.3s ease-out !important;
 }
 
 #multicopy-toast.error {
-  border-left-color: #ef4444 !important;
+  border-left-color: #d46b5a !important;
 }
 
 @keyframes multicopy-slide-down {
   from {
     opacity: 0;
-    transform: translate(-50%, -25px);
+    transform: translate(-50%, -20px);
   }
   to {
     opacity: 1;
@@ -126,7 +127,7 @@
 @keyframes multicopy-toast-slide {
   from {
     opacity: 0;
-    transform: translateY(25px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
