@@ -237,21 +237,28 @@ const ElementPicker = {
   /**
    * Muestra un mensaje Toast en la página web
    */
-  showToast(message, isError = false) {
+  showToast(message, isError = false, duration = isError ? 15000 : 7000) {
     const existing = document.getElementById('multicopy-toast');
     if (existing) existing.remove();
 
     const toast = document.createElement('div');
     toast.id = 'multicopy-toast';
     if (isError) toast.classList.add('error');
+    toast.style.cursor = 'pointer';
+    toast.title = 'Haz clic para cerrar';
     toast.innerText = message;
+
+    toast.addEventListener('click', () => {
+      toast.remove();
+    });
+
     document.body.appendChild(toast);
 
     setTimeout(() => {
       if (toast && toast.parentElement) {
         toast.remove();
       }
-    }, 4000);
+    }, duration);
   }
 };
 

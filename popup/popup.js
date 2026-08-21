@@ -276,13 +276,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnFillForm.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> RELLENAR FORMULARIO';
   }
 
-  function showFeedback(msg, isError = false) {
+  let feedbackTimer = null;
+  function showFeedback(msg, isError = false, duration = isError ? 15000 : 7000) {
+    if (feedbackTimer) clearTimeout(feedbackTimer);
     fillFeedback.textContent = msg;
-    fillFeedback.style.color = isError ? 'var(--danger)' : 'var(--success)';
-    setTimeout(() => {
+    fillFeedback.style.color = isError ? 'var(--accent-stamp, #d46b5a)' : 'var(--accent-green, #5a8a6e)';
+    fillFeedback.style.cursor = 'pointer';
+    fillFeedback.title = 'Haz clic para descartar';
+    feedbackTimer = setTimeout(() => {
       fillFeedback.textContent = '';
-    }, 4500);
+    }, duration);
   }
+
+  fillFeedback.addEventListener('click', () => {
+    if (feedbackTimer) clearTimeout(feedbackTimer);
+    fillFeedback.textContent = '';
+  });
 
   // ==========================================
   // GESTIÓN DE VISTAS Y PERFILES
