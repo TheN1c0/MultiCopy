@@ -1,0 +1,9 @@
+﻿RUT	Nombre	Apellido	Email	Teléfono	Fecha Nacimiento	Sexo	Observaciones	Acepta Términos	Tipo Contrato
+12.345.678-9	Juan	Pérez	juan.perez@empresa.cl	912345678	20/08/1990	Masculino	Ingeniero de Software Senior con experiencia en arquitectura cloud.	si	Indefinido
+18.765.432-1	María	Soto	maria.soto@empresa.cl	987654321	15/03/1995	Femenino	Diseñadora UX/UI especialista en Design Systems y Figma.	si	Plazo Fijo
+15.987.654-3	Carlos	González	carlos.gonzalez@consultora.cl	955512345	10/11/1988	Masculino	Consultor DevOps y especialista en Docker y Kubernetes.	si	Honorarios
+19.456.789-0	Camila	Rojas	camila.rojas@techcorp.com	977788990	05/07/1997	Femenino	Desarrolladora Frontend React y Vue con 4 años de experiencia.	si	Indefinido
+11.223.344-5	Roberto	Muñoz	roberto.munoz@innovacion.cl	944433221	12/01/1982	Masculino	Project Manager certificado PMP con manejo de metodologías ágiles Scrum.	si	Indefinido
+17.332.114-K	Valentina	Morales	v.morales@analytics.cl	966677889	28/09/1993	Femenino	Científica de Datos con dominio en Python, Pandas y Machine Learning.	si	Plazo Fijo
+16.889.900-2	Ignacio	Bravo	ignacio.bravo@bravobytes.cl	933322110	14/04/1991	Masculino	Analista Programador Fullstack y creador de soluciones web a medida.	si	Indefinido
+20.112.233-4	Francisca	Vargas	fran.vargas@marketing.com	988899001	03/12/1999	Femenino	Especialista en Growth Marketing y optimización de conversiones.	si	Honorarios
