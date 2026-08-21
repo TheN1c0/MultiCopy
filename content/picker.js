@@ -78,6 +78,7 @@ const ElementPicker = {
       e.stopPropagation();
       this.stop();
       this.showToast('Selección visual cancelada');
+      this.requestReopenPopup();
     });
   },
 
@@ -153,6 +154,7 @@ const ElementPicker = {
     if (!selector) {
       this.showToast('No se pudo generar un selector válido para este elemento', true);
       this.stop();
+      this.requestReopenPopup();
       return;
     }
 
@@ -170,12 +172,25 @@ const ElementPicker = {
     }
 
     this.stop();
+    this.requestReopenPopup();
   },
 
   onKeyDown(e) {
     if (e.key === 'Escape') {
       this.stop();
       this.showToast('Selección visual cancelada');
+      this.requestReopenPopup();
+    }
+  },
+
+  /**
+   * Solicita al background service worker reabrir el popup de la extensión
+   */
+  requestReopenPopup() {
+    try {
+      chrome.runtime.sendMessage({ action: 'REOPEN_POPUP' });
+    } catch (err) {
+      console.warn('MultiCopy: No se pudo enviar mensaje para reabrir popup:', err);
     }
   },
 

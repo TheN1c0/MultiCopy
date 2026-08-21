@@ -8,7 +8,8 @@ const Storage = {
   KEYS: {
     PROFILES: 'multicopy_profiles',
     ACTIVE_PROFILE_ID: 'multicopy_active_profile_id',
-    PENDING_PICK: 'multicopy_pending_pick'
+    PENDING_PICK: 'multicopy_pending_pick',
+    LAST_VIEW_STATE: 'multicopy_last_view_state'
   },
 
   /**
@@ -147,6 +148,35 @@ const Storage = {
   async clearPendingPick() {
     return new Promise((resolve) => {
       chrome.storage.local.remove([this.KEYS.PENDING_PICK], resolve);
+    });
+  },
+
+  /**
+   * Guarda el estado de la última vista (para restaurar al reabrir el popup)
+   */
+  async saveLastViewState(state) {
+    return new Promise((resolve) => {
+      chrome.storage.local.set({ [this.KEYS.LAST_VIEW_STATE]: state }, resolve);
+    });
+  },
+
+  /**
+   * Obtiene el estado de la última vista guardada
+   */
+  async getLastViewState() {
+    return new Promise((resolve) => {
+      chrome.storage.local.get([this.KEYS.LAST_VIEW_STATE], (result) => {
+        resolve(result[this.KEYS.LAST_VIEW_STATE] || null);
+      });
+    });
+  },
+
+  /**
+   * Limpia el estado de la última vista
+   */
+  async clearLastViewState() {
+    return new Promise((resolve) => {
+      chrome.storage.local.remove([this.KEYS.LAST_VIEW_STATE], resolve);
     });
   }
 };

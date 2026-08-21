@@ -63,6 +63,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadProfilesAndMatchDomain();
     await refreshClipboardState();
     setupEventListeners();
+
+    // Restaurar la última vista si venimos de una selección de campo
+    const lastView = await Storage.getLastViewState();
+    if (lastView && lastView.view === 'fields' && lastView.profileId) {
+      await openFieldsView(lastView.profileId);
+    }
   }
 
   /**
@@ -354,8 +360,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ==========================================
   async function openFieldsView(profileId) {
     currentEditingProfileId = profileId;
+    currentProfiles = await Storage.getProfiles();
     const profile = currentProfiles.find(p => p.id === profileId);
     if (!profile) return;
+
+    await Storage.saveLastViewState({ view: 'fields', profileId });
 
     fieldsViewTitle.textContent = `Campos: ${profile.name}`;
     inputProfileDomain.value = profile.domain || '';
@@ -480,6 +489,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     try {
+      await Storage.saveLastViewState({
+        view: 'fields',
+        profileId: profileId
+      });
+
       await ensureContentScriptsInjected(activeTab.id);
 
       chrome.tabs.sendMessage(activeTab.id, {
@@ -523,12 +537,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     btnManageProfiles.addEventListener('click', openProfilesView);
     btnBackFromProfiles.addEventListener('click', async () => {
+      await Storage.clearLastViewState();
       await loadProfilesAndMatchDomain();
       renderPreview();
       showView('main');
     });
 
     btnBackFromFields.addEventListener('click', async () => {
+      await Storage.clearLastViewState();
       await loadProfilesAndMatchDomain();
       renderPreview();
       showView('main');
