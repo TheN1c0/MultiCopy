@@ -46,10 +46,11 @@
   padding: 0;
 }
 
-body {
+html, body {
   width: 380px;
-  min-height: 520px;
-  max-height: 620px;
+  height: auto;
+  margin: 0;
+  padding: 0;
   background-color: var(--bg-desk);
   /* Patrón sutil de puntos de libreta */
   background-image: radial-gradient(#d3ccc0 1.2px, transparent 1.2px);
@@ -58,20 +59,38 @@ body {
   font-family: var(--font-sans);
   font-size: 13px;
   line-height: 1.45;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden;
+}
+
+/* Scrollbars discretos para listas internas */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d8d1c4;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b5ada0;
 }
 
 .app-container {
   display: flex;
   flex-direction: column;
-  min-height: 520px;
   background: var(--bg-paper);
-  margin: 8px;
+  margin: 6px;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-paper);
   box-shadow: var(--shadow-paper);
   position: relative;
+  overflow: hidden;
 }
 
 /* Header */
