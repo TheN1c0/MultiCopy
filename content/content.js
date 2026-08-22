@@ -47,15 +47,15 @@ function fillFormFields(fields, columns) {
   fields.forEach(field => {
     const colIndex = parseInt(field.columnIndex, 10);
     const value = columns[colIndex];
-    const fieldName = field.name || `Columna ${colIndex + 1}`;
+    const fieldName = field.name || `Dato #${colIndex + 1}`;
 
     if (value === undefined || value === null || String(value).trim() === '') {
-      errors.push(`"${fieldName}": La columna ${colIndex + 1} de Excel está vacía`);
+      errors.push(`"${fieldName}": El dato #${colIndex + 1} de la fila está vacío`);
       return;
     }
 
     if (!field.selector) {
-      errors.push(`"${fieldName}": No tiene selector asignado`);
+      errors.push(`"${fieldName}": No tiene campo vinculado en la página`);
       return;
     }
 
@@ -83,7 +83,7 @@ function fillFormFields(fields, columns) {
     const firstError = errors[0] || '';
     ElementPicker.showToast(`⚠️ MultiCopy: Se rellenaron ${filledCount} de ${fields.length} campos. (${firstError})`, true);
   } else {
-    const firstError = errors[0] || 'Revisa la correspondencia de columnas con el formulario';
+    const firstError = errors[0] || 'Revisa la correspondencia de los datos de la fila con el formulario';
     ElementPicker.showToast(`⚠️ MultiCopy: ${firstError}`, true);
   }
 

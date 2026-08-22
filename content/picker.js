@@ -64,7 +64,7 @@ const ElementPicker = {
     this.bannerEl = document.createElement('div');
     this.bannerEl.id = 'multicopy-picker-banner';
     
-    const label = this.currentContext?.fieldName || `Columna ${this.currentContext?.columnIndex + 1 || ''}`;
+    const label = this.currentContext?.fieldName || `Dato #${(this.currentContext?.columnIndex ?? 0) + 1}`;
     
     this.bannerEl.innerHTML = `
       <span class="multicopy-badge">MultiCopy</span>
@@ -168,7 +168,7 @@ const ElementPicker = {
         selector: selector
       });
 
-      this.showToast(`✓ Campo elegido: "${webFieldName}" vinculado a "${ctx.fieldName || 'Columna ' + (ctx.columnIndex + 1)}"`);
+      this.showToast(`✓ Campo elegido: "${webFieldName}" vinculado a "${ctx.fieldName || 'Dato #' + (ctx.columnIndex + 1)}"`);
     }
 
     this.stop();

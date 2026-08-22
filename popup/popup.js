@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       btnFillForm.disabled = true;
     } else {
       clipboardStatusDot.className = 'status-dot dot-green';
-      clipboardStatusText.textContent = `✓ Fila detectada (${clipboardData.columns.length} columnas)`;
+      clipboardStatusText.textContent = `✓ Fila detectada (${clipboardData.columns.length} datos)`;
       clipboardEmptyHint.classList.add('hidden');
       previewContainer.classList.remove('hidden');
       btnFillForm.disabled = false;
@@ -189,7 +189,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function renderPreview() {
-    previewColCount.textContent = `${clipboardData.columns.length} columnas`;
+    previewColCount.textContent = `${clipboardData.columns.length} datos`;
     previewList.innerHTML = '';
 
     const fields = currentActiveProfile ? (currentActiveProfile.fields || []) : [];
@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // Buscar si este índice de columna está configurado en el perfil activo
       const mappedField = fields.find(f => parseInt(f.columnIndex, 10) === idx);
-      const colLabel = mappedField ? `${mappedField.name} (Col ${idx + 1})` : `Columna ${idx + 1}`;
+      const colLabel = mappedField ? `${mappedField.name} (Dato #${idx + 1})` : `Dato #${idx + 1}`;
 
       item.innerHTML = `
         <span class="preview-col-name" title="${colLabel}">${colLabel}</span>
@@ -411,8 +411,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       card.innerHTML = `
         <div class="list-item-info">
-          <span class="list-item-title">${field.name || `Campo ${idx + 1}`}</span>
-          <span class="list-item-sub">Columna Excel: <strong>${colNum}</strong> • ${statusBadge}</span>
+          <span class="list-item-title">${field.name || `Dato #${idx + 1}`}</span>
+          <span class="list-item-sub">Dato de la fila: <strong>#${colNum}</strong> • ${statusBadge}</span>
           <span class="list-item-sub" style="font-family: monospace; font-size: 10px; color: var(--text-muted);">${field.selector || 'Sin asignar'}</span>
         </div>
         <div class="list-item-actions">
@@ -455,7 +455,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   function resetFieldEditorForm() {
     editFieldId.value = '';
     inputFieldName.value = '';
-    // Sugerir la siguiente columna disponible
+    // Sugerir la siguiente posición disponible
     const profile = currentProfiles.find(p => p.id === currentEditingProfileId);
     const nextCol = (profile?.fields?.length || 0) + 1;
     inputColumnIndex.value = nextCol;
@@ -468,7 +468,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const profile = currentProfiles.find(p => p.id === currentEditingProfileId);
     if (!profile) return;
 
-    const name = inputFieldName.value.trim() || `Columna ${inputColumnIndex.value}`;
+    const name = inputFieldName.value.trim() || `Dato #${inputColumnIndex.value}`;
     const colIdx = Math.max(0, (parseInt(inputColumnIndex.value, 10) || 1) - 1);
     const selector = inputFieldSelector.value.trim();
     const fieldId = editFieldId.value;
@@ -518,7 +518,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         context: {
           profileId,
           fieldId,
-          fieldName: fieldName || inputFieldName.value.trim() || `Columna ${inputColumnIndex.value}`,
+          fieldName: fieldName || inputFieldName.value.trim() || `Dato #${inputColumnIndex.value}`,
           columnIndex: columnIndex !== undefined ? columnIndex : Math.max(0, (parseInt(inputColumnIndex.value, 10) || 1) - 1)
         }
       }, () => {
@@ -598,7 +598,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     btnStartPickElement.addEventListener('click', () => {
       const colIdx = Math.max(0, (parseInt(inputColumnIndex.value, 10) || 1) - 1);
-      const name = inputFieldName.value.trim() || `Columna ${colIdx + 1}`;
+      const name = inputFieldName.value.trim() || `Dato #${colIdx + 1}`;
       triggerVisualPicker(currentEditingProfileId, editFieldId.value || null, name, colIdx);
     });
   }
