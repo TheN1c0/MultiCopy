@@ -44,6 +44,23 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
+}
+
+input, textarea, [contenteditable="true"] {
+  user-select: text;
+  -webkit-user-select: text;
+  cursor: text;
+}
+
+button, a, select, input[type="checkbox"], input[type="radio"], summary, label, .btn-link, .info-tooltip-icon, .stepper-btn {
+  cursor: pointer;
+}
+
+label[for] {
+  cursor: pointer;
 }
 
 html {
@@ -67,6 +84,9 @@ body {
   font-size: 12.5px;
   line-height: 1.4;
   overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
 }
 
 /* Scrollbars discretos para listas internas */
