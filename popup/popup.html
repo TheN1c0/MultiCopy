@@ -89,12 +89,11 @@
       <!-- Botón Principal Rellenar -->
       <section class="actions-container">
         <button id="btn-fill-form" class="btn-primary btn-block btn-lg" disabled>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
           RELLENAR FORMULARIO
         </button>
         <div id="fill-feedback" class="feedback-msg"></div>
         <div class="shortcut-info-bar">
-          <span>⚡ Atajo rápido: <kbd id="shortcut-display">Ctrl+Shift+Y</kbd></span>
+          <span>Atajo rápido: <kbd id="shortcut-display">Ctrl+Shift+Y</kbd></span>
           <button id="btn-configure-shortcut" class="btn-link" type="button" title="Personalizar atajo de teclado en Chrome">Cambiar</button>
         </div>
       </section>
@@ -141,19 +140,22 @@
 
       <!-- Formulario para agregar / editar campo -->
       <div class="field-editor-card">
-        <h3 id="field-form-title" style="font-family: var(--font-mono); font-size: 12.5px; margin-bottom: 8px;">Agregar nuevo campo</h3>
+        <h3 id="field-form-title" style="font-family: var(--font-mono); font-size: 13px; font-weight: 700; margin-bottom: 12px;">Agregar nuevo campo</h3>
         <input type="hidden" id="edit-field-id" value="">
         
-        <div class="form-group">
+        <!-- Nombre del campo -->
+        <div class="form-group" style="margin-bottom: 12px;">
           <label class="field-label" for="input-field-name">Nombre del campo</label>
           <input type="text" id="input-field-name" class="form-control" placeholder="Ej: RUT, Nombre, Email, Teléfono...">
         </div>
 
-        <div class="form-row-2">
-          <div class="form-group">
-            <label class="field-label" for="input-column-index">
+        <!-- Fila de 2 columnas: Izquierda (Dato de la fila) | Derecha (Casilla de letras + Aviso) -->
+        <div class="column-config-row">
+          <!-- Columna Izquierda: Dato de la fila -->
+          <div class="column-left-box">
+            <label class="field-label" for="input-column-display">
               Dato de la fila
-              <span class="info-tooltip-icon" title="Indica qué dato de la fila copiada quieres utilizar. 1 = primer dato, 2 = segundo dato, 3 = tercero...">
+              <span class="info-tooltip-icon" title="Indica qué dato de la fila copiada quieres utilizar. 1 = primer dato (A), 2 = segundo dato (B), 3 = tercero (C)...">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="12" r="10"></circle>
                   <line x1="12" y1="16" x2="12" y2="12"></line>
@@ -161,23 +163,64 @@
                 </svg>
               </span>
             </label>
-            <input type="number" id="input-column-index" class="form-control" min="1" max="100" value="1">
+            <div class="stepper-input-container">
+              <input type="text" id="input-column-display" class="form-control stepper-input" value="A" autocomplete="off" spellcheck="false">
+              <input type="hidden" id="input-column-index" value="0">
+              <div class="stepper-buttons">
+                <button type="button" id="btn-step-col-up" class="stepper-btn" title="Siguiente columna" aria-label="Aumentar columna">▲</button>
+                <button type="button" id="btn-step-col-down" class="stepper-btn" title="Columna anterior" aria-label="Disminuir columna">▼</button>
+              </div>
+            </div>
           </div>
-          <div class="form-group">
-            <label class="field-label">Elegir en la página</label>
-            <button id="btn-start-pick-element" class="btn-accent btn-block" type="button" title="Haz clic aquí y luego en el campo que quieres rellenar en tu formulario web">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="22" y1="12" x2="18" y2="12"></line><line x1="6" y1="12" x2="2" y2="12"></line><line x1="12" y1="6" x2="12" y2="2"></line><line x1="12" y1="22" x2="12" y2="18"></line></svg>
-              Elegir campo
-            </button>
+
+          <!-- Columna Derecha: Casilla de conversión a letras + aviso -->
+          <div class="column-right-box">
+            <label class="checkbox-label-styled" for="chk-use-column-letters">
+              <input type="checkbox" id="chk-use-column-letters" checked>
+              <span class="checkbox-custom"></span>
+              <span class="checkbox-text-group">
+                <span class="checkbox-main-title">
+                  Convertir números de columna en letras
+                  <span class="info-tooltip-icon" title="Muestra las columnas como letras (A, B, C...) igual que en Excel. Si se desmarca, se mostrarán como números (1, 2, 3...).">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="16" x2="12" y2="12"></line>
+                      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                  </span>
+                </span>
+                <span class="checkbox-subtext">Ej: 1 = A, 2 = B, 3 = C...</span>
+              </span>
+            </label>
+
+            <!-- Banner azul de aviso de inicio en primera columna -->
+            <div class="column-assumption-banner">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              <span>Se asume que la selección de columnas parte desde la primera columna.</span>
+            </div>
           </div>
         </div>
 
-        <div class="card-footer-buttons">
-          <button id="btn-cancel-edit-field" class="btn-ghost btn-sm hidden" type="button">Cancelar</button>
-          <button id="btn-save-field" class="btn-primary btn-sm" type="button">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-            Guardar Campo
-          </button>
+        <!-- Fila de Acciones: Elegir campo (Izquierda) + Guardar/Cancelar (Derecha) -->
+        <div class="field-actions-row">
+          <div class="pick-action-container">
+            <label class="field-label" style="margin-bottom: 4px;">Elegir campo en la página</label>
+            <button id="btn-start-pick-element" class="btn-accent btn-pick-large" type="button" title="Haz clic aquí y luego en el campo que quieres rellenar en tu formulario web">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="22" y1="12" x2="18" y2="12"></line><line x1="6" y1="12" x2="2" y2="12"></line><line x1="12" y1="6" x2="12" y2="2"></line><line x1="12" y1="22" x2="12" y2="18"></line></svg>
+              Elegir campo
+            </button>
+          </div>
+          <div class="save-action-container">
+            <button id="btn-cancel-edit-field" class="btn-ghost btn-sm hidden" type="button">Cancelar</button>
+            <button id="btn-save-field" class="btn-primary" type="button">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+              Guardar campo
+            </button>
+          </div>
         </div>
       </div>
 
@@ -219,7 +262,7 @@
 
     <!-- Footer -->
     <footer class="app-footer">
-      <span>MultiCopy • <strong>Lo-Fi Stationery Edition ☕</strong></span>
+      <span>MultiCopy • v1.0.0 • <a href="https://bravo-bytes.com" target="_blank" rel="noopener noreferrer" class="footer-link">Bravo Bytes</a></span>
     </footer>
   </div>
 

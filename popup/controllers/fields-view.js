@@ -1,11 +1,14 @@
 /**
  * MultiCopy - Fields View Controller
  * Gestiona la configuración, vinculación visual, edición y eliminación de campos del perfil.
+ * Soporta conversión de columnas entre letras (A, B, C...) y números (1, 2, 3...).
  */
 
 const FieldsViewController = {
   app: null,
   currentProfileId: null,
+  currentColumnIndex: 0,
+  useColumnLetters: true,
   dom: {},
 
   init(app) {
@@ -23,7 +26,11 @@ const FieldsViewController = {
       fieldFormTitle: document.getElementById('field-form-title'),
       editFieldId: document.getElementById('edit-field-id'),
       inputFieldName: document.getElementById('input-field-name'),
+      inputColumnDisplay: document.getElementById('input-column-display'),
       inputColumnIndex: document.getElementById('input-column-index'),
+      btnStepColUp: document.getElementById('btn-step-col-up'),
+      btnStepColDown: document.getElementById('btn-step-col-down'),
+      chkUseColumnLetters: document.getElementById('chk-use-column-letters'),
       btnStartPickElement: document.getElementById('btn-start-pick-element'),
       inputFieldSelector: document.getElementById('input-field-selector'),
       btnCancelEditField: document.getElementById('btn-cancel-edit-field'),
@@ -41,7 +48,6 @@ const FieldsViewController = {
     });
 
     this.dom.btnSaveDomain.addEventListener('click', () => this.handleSaveDomain());
-
     this.dom.btnSaveField.addEventListener('click', () => this.handleSaveField());
 
     this.dom.btnCancelEditField.addEventListener('click', () => {
@@ -49,9 +55,49 @@ const FieldsViewController = {
       this.resetFieldEditorForm(profile);
     });
 
+    // Steppers de columna ▲ / ▼
+    if (this.dom.btnStepColUp) {
+      this.dom.btnStepColUp.addEventListener('click', () => this.stepColumn(1));
+    }
+    if (this.dom.btnStepColDown) {
+      this.dom.btnStepColDown.addEventListener('click', () => this.stepColumn(-1));
+    }
+
+    // Input directo de columna
+    if (this.dom.inputColumnDisplay) {
+      this.dom.inputColumnDisplay.addEventListener('input', (e) => {
+        this.handleColumnInput(e.target.value);
+      });
+
+      this.dom.inputColumnDisplay.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          this.stepColumn(1);
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          this.stepColumn(-1);
+        }
+      });
+    }
+
+    // Checkbox de conversión de columnas a letras
+    if (this.dom.chkUseColumnLetters) {
+      this.dom.chkUseColumnLetters.addEventListener('change', (e) => {
+        this.useColumnLetters = e.target.checked;
+        this.updateColumnDisplay();
+        const profile = this.getCurrentProfile();
+        if (profile) this.renderFieldsList(profile);
+      });
+    }
+
+    // Botón Elegir campo (Inicia selector visual con la columna y nombre configurados)
     this.dom.btnStartPickElement.addEventListener('click', () => {
-      const colIdx = Math.max(0, (parseInt(this.dom.inputColumnIndex.value, 10) || 1) - 1);
-      const name = this.dom.inputFieldName.value.trim() || `Dato #${colIdx + 1}`;
+      const colIdx = this.currentColumnIndex;
+      const colLabel = this.useColumnLetters 
+        ? `Columna ${FieldModel.indexToLetter(colIdx)}`
+        : `Dato #${colIdx + 1}`;
+
+      const name = this.dom.inputFieldName.value.trim() || colLabel;
       this.triggerVisualPicker(this.currentProfileId, this.dom.editFieldId.value || null, name, colIdx);
     });
   },
@@ -59,6 +105,60 @@ const FieldsViewController = {
   getCurrentProfile() {
     const profiles = this.app.getProfiles();
     return profiles.find(p => p.id === this.currentProfileId) || null;
+  },
+
+  /**
+   * Actualiza el valor mostrado en el input de columna según el modo (letras o números)
+   */
+  updateColumnDisplay() {
+    if (!this.dom.inputColumnDisplay) return;
+
+    if (this.useColumnLetters) {
+      const letter = typeof FieldModel !== 'undefined' 
+        ? FieldModel.indexToLetter(this.currentColumnIndex)
+        : String.fromCharCode(65 + this.currentColumnIndex);
+      this.dom.inputColumnDisplay.value = letter;
+    } else {
+      this.dom.inputColumnDisplay.value = String(this.currentColumnIndex + 1);
+    }
+
+    if (this.dom.inputColumnIndex) {
+      this.dom.inputColumnIndex.value = this.currentColumnIndex;
+    }
+  },
+
+  /**
+   * Maneja el cambio manual de texto en el input de columna
+   */
+  handleColumnInput(rawVal) {
+    if (!rawVal || rawVal.trim() === '') {
+      this.currentColumnIndex = 0;
+      this.updateColumnDisplay();
+      return;
+    }
+
+    if (this.useColumnLetters) {
+      if (typeof FieldModel !== 'undefined') {
+        this.currentColumnIndex = FieldModel.letterToIndex(rawVal);
+      } else {
+        this.currentColumnIndex = Math.max(0, rawVal.toUpperCase().charCodeAt(0) - 65);
+      }
+    } else {
+      const num = parseInt(rawVal, 10);
+      this.currentColumnIndex = isNaN(num) ? 0 : Math.max(0, num - 1);
+    }
+
+    if (this.dom.inputColumnIndex) {
+      this.dom.inputColumnIndex.value = this.currentColumnIndex;
+    }
+  },
+
+  /**
+   * Incrementa o disminuye el índice de columna
+   */
+  stepColumn(delta) {
+    this.currentColumnIndex = Math.max(0, this.currentColumnIndex + delta);
+    this.updateColumnDisplay();
   },
 
   async render(profileId) {
@@ -88,7 +188,11 @@ const FieldsViewController = {
       const card = document.createElement('div');
       card.className = 'list-item-card';
 
-      const colNum = (parseInt(field.columnIndex, 10) || 0) + 1;
+      const colIdx = parseInt(field.columnIndex, 10) || 0;
+      const colDisplay = this.useColumnLetters && typeof FieldModel !== 'undefined'
+        ? FieldModel.indexToLetter(colIdx)
+        : (colIdx + 1);
+
       const statusBadge = field.selector 
         ? '<span style="color:var(--success); font-weight: 600;">✓ Vinculado</span>' 
         : '<span style="color:var(--warning); font-weight: 600;">Sin vincular</span>';
@@ -96,7 +200,7 @@ const FieldsViewController = {
       card.innerHTML = `
         <div class="list-item-info">
           <span class="list-item-title">${field.name || `Campo ${idx + 1}`}</span>
-          <span class="list-item-sub">Dato de la fila: <strong>${colNum}</strong> · ${statusBadge}</span>
+          <span class="list-item-sub">Dato de la fila: <strong>${colDisplay}</strong> · ${statusBadge}</span>
         </div>
         <div class="list-item-actions">
           <button class="btn-accent btn-sm btn-pill btn-pick-row" data-id="${field.id}" title="Volver a vincular" aria-label="Volver a vincular">
@@ -118,8 +222,11 @@ const FieldsViewController = {
       card.querySelector('.btn-edit-field').addEventListener('click', () => {
         this.dom.editFieldId.value = field.id;
         this.dom.inputFieldName.value = field.name || '';
-        this.dom.inputColumnIndex.value = (parseInt(field.columnIndex, 10) || 0) + 1;
-        this.dom.inputFieldSelector.value = field.selector || '';
+        this.currentColumnIndex = parseInt(field.columnIndex, 10) || 0;
+        this.updateColumnDisplay();
+        if (this.dom.inputFieldSelector) {
+          this.dom.inputFieldSelector.value = field.selector || '';
+        }
         this.dom.fieldFormTitle.textContent = 'Editar campo';
         this.dom.btnCancelEditField.classList.remove('hidden');
       });
@@ -138,9 +245,12 @@ const FieldsViewController = {
   resetFieldEditorForm(profile) {
     this.dom.editFieldId.value = '';
     this.dom.inputFieldName.value = '';
-    const nextCol = (profile?.fields?.length || 0) + 1;
-    this.dom.inputColumnIndex.value = nextCol;
-    this.dom.inputFieldSelector.value = '';
+    // Sugerir la siguiente posición disponible
+    this.currentColumnIndex = profile?.fields?.length || 0;
+    this.updateColumnDisplay();
+    if (this.dom.inputFieldSelector) {
+      this.dom.inputFieldSelector.value = '';
+    }
     this.dom.fieldFormTitle.textContent = 'Agregar nuevo campo';
     this.dom.btnCancelEditField.classList.add('hidden');
   },
@@ -149,9 +259,13 @@ const FieldsViewController = {
     const profile = this.getCurrentProfile();
     if (!profile) return;
 
-    const name = this.dom.inputFieldName.value.trim() || `Dato #${this.dom.inputColumnIndex.value}`;
-    const colIdx = Math.max(0, (parseInt(this.dom.inputColumnIndex.value, 10) || 1) - 1);
-    const selector = this.dom.inputFieldSelector.value.trim();
+    const colIdx = this.currentColumnIndex;
+    const defaultLabel = this.useColumnLetters && typeof FieldModel !== 'undefined'
+      ? `Columna ${FieldModel.indexToLetter(colIdx)}`
+      : `Dato #${colIdx + 1}`;
+
+    const name = this.dom.inputFieldName.value.trim() || defaultLabel;
+    const selector = this.dom.inputFieldSelector ? this.dom.inputFieldSelector.value.trim() : '';
     const fieldId = this.dom.editFieldId.value;
 
     const fieldData = typeof FieldModel !== 'undefined'
@@ -200,14 +314,19 @@ const FieldsViewController = {
 
       await this.app.ensureContentScriptsInjected(activeTab.id);
 
+      const colIdx = columnIndex !== undefined ? columnIndex : this.currentColumnIndex;
+      const defaultLabel = this.useColumnLetters && typeof FieldModel !== 'undefined'
+        ? `Columna ${FieldModel.indexToLetter(colIdx)}`
+        : `Dato #${colIdx + 1}`;
+
       const startPickAction = typeof ACTIONS !== 'undefined' ? ACTIONS.START_PICKER : 'START_PICKER';
       chrome.tabs.sendMessage(activeTab.id, {
         action: startPickAction,
         context: {
           profileId,
           fieldId,
-          fieldName: fieldName || this.dom.inputFieldName.value.trim() || `Dato #${this.dom.inputColumnIndex.value}`,
-          columnIndex: columnIndex !== undefined ? columnIndex : Math.max(0, (parseInt(this.dom.inputColumnIndex.value, 10) || 1) - 1)
+          fieldName: fieldName || this.dom.inputFieldName.value.trim() || defaultLabel,
+          columnIndex: colIdx
         }
       }, () => {
         window.close();
