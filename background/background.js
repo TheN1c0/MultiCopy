@@ -3,7 +3,7 @@
  * Gestiona eventos de fondo, atajos de teclado y reapertura automática del popup
  */
 
-importScripts('../utils/constants.js', '../utils/storage.js');
+importScripts('../utils/constants.js', '../utils/models.js', '../utils/storage.js');
 
 /**
  * Obtiene el perfil asociado al dominio de la URL o el perfil activo
@@ -77,6 +77,7 @@ chrome.commands.onCommand.addListener(async (command) => {
                 target: { tabId },
                 files: [
                   'utils/constants.js',
+                  'utils/models.js',
                   'utils/storage.js',
                   'utils/clipboard.js',
                   'utils/selector.js',

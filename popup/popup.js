@@ -77,23 +77,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function ensureDefaultProfiles() {
     const profiles = await Storage.getProfiles();
     if (profiles.length === 0) {
-      const defaultProfile = {
-        id: 'prof_default_1',
-        name: 'Formulario de Prueba',
-        domain: '',
-        fields: [
-          { id: 'f1', name: 'RUT', columnIndex: 0, selector: '#rut', webFieldName: 'RUT' },
-          { id: 'f2', name: 'Nombre', columnIndex: 1, selector: '#nombre', webFieldName: 'Nombre' },
-          { id: 'f3', name: 'Apellido', columnIndex: 2, selector: '#apellido', webFieldName: 'Apellido' },
-          { id: 'f4', name: 'Email', columnIndex: 3, selector: '#email', webFieldName: 'Correo Electrónico' },
-          { id: 'f5', name: 'Teléfono', columnIndex: 4, selector: '#telefono', webFieldName: 'Teléfono' },
-          { id: 'f6', name: 'Fecha Nacimiento', columnIndex: 5, selector: '#fecha_nacimiento', webFieldName: 'Fecha' },
-          { id: 'f7', name: 'Sexo / Género', columnIndex: 6, selector: '#sexo', webFieldName: 'Sexo' },
-          { id: 'f8', name: 'Observaciones', columnIndex: 7, selector: '#observaciones', webFieldName: 'Observaciones' },
-          { id: 'f9', name: 'Acepta Términos', columnIndex: 8, selector: '#terminos', webFieldName: 'Términos' },
-          { id: 'f10', name: 'Tipo Contrato', columnIndex: 9, selector: 'input[name="contrato"]', webFieldName: 'Contrato' }
-        ]
-      };
+      const defaultProfile = typeof ProfileModel !== 'undefined' 
+        ? ProfileModel.getDefaultProfile()
+        : {
+          id: 'prof_default_1',
+          name: 'Formulario de Prueba',
+          domain: '',
+          fields: []
+        };
       await Storage.saveProfile(defaultProfile);
     }
   }
@@ -359,11 +350,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const name = inputNewProfileName.value.trim();
     if (!name) return;
 
-    const newProfile = await Storage.saveProfile({
-      name: name,
-      domain: '',
-      fields: []
-    });
+    const newProfileData = typeof ProfileModel !== 'undefined'
+      ? ProfileModel.create({ name })
+      : { name, domain: '', fields: [] };
+
+    const newProfile = await Storage.saveProfile(newProfileData);
 
     inputNewProfileName.value = '';
     currentProfiles = await Storage.getProfiles();
@@ -473,20 +464,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     const selector = inputFieldSelector.value.trim();
     const fieldId = editFieldId.value;
 
+    const fieldData = typeof FieldModel !== 'undefined'
+      ? FieldModel.create({ id: fieldId || undefined, name, columnIndex: colIdx, selector })
+      : { id: fieldId || ('f_' + Date.now()), name, columnIndex: colIdx, selector };
+
     profile.fields = profile.fields || [];
 
     if (fieldId) {
       const idx = profile.fields.findIndex(f => f.id === fieldId);
       if (idx !== -1) {
-        profile.fields[idx] = { ...profile.fields[idx], name, columnIndex: colIdx, selector };
+        profile.fields[idx] = { ...profile.fields[idx], ...fieldData };
       }
     } else {
-      profile.fields.push({
-        id: 'f_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
-        name,
-        columnIndex: colIdx,
-        selector
-      });
+      profile.fields.push(fieldData);
     }
 
     await Storage.saveProfile(profile);
@@ -644,6 +634,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               target: { tabId },
               files: [
                 'utils/constants.js',
+                'utils/models.js',
                 'utils/storage.js',
                 'utils/clipboard.js',
                 'utils/selector.js',

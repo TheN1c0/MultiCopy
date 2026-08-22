@@ -19,8 +19,11 @@ const Storage = {
   async getProfiles() {
     return new Promise((resolve) => {
       chrome.storage.local.get([this.KEYS.PROFILES], (result) => {
-        const profiles = result[this.KEYS.PROFILES] || [];
-        resolve(profiles);
+        const rawProfiles = result[this.KEYS.PROFILES] || [];
+        const normalizedProfiles = rawProfiles.map((p) => {
+          return typeof ProfileModel !== 'undefined' ? ProfileModel.normalize(p) : p;
+        });
+        resolve(normalizedProfiles);
       });
     });
   },
@@ -31,8 +34,12 @@ const Storage = {
    * @returns {Promise<void>}
    */
   async saveProfiles(profiles) {
+    const normalized = Array.isArray(profiles)
+      ? profiles.map(p => typeof ProfileModel !== 'undefined' ? ProfileModel.normalize(p) : p)
+      : [];
+
     return new Promise((resolve) => {
-      chrome.storage.local.set({ [this.KEYS.PROFILES]: profiles }, () => {
+      chrome.storage.local.set({ [this.KEYS.PROFILES]: normalized }, () => {
         resolve();
       });
     });
@@ -91,24 +98,22 @@ const Storage = {
    * @returns {Promise<Object>} Perfil guardado
    */
   async saveProfile(profile) {
+    const normalized = typeof ProfileModel !== 'undefined' 
+      ? ProfileModel.normalize(profile) 
+      : { ...profile, id: profile.id || ('prof_' + Date.now()), fields: profile.fields || [] };
+
     const profiles = await this.getProfiles();
-    if (!profile.id) {
-      profile.id = 'prof_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-      profile.fields = profile.fields || [];
-      profile.createdAt = Date.now();
-      profiles.push(profile);
+    const index = profiles.findIndex(p => p.id === normalized.id);
+
+    if (index !== -1) {
+      profiles[index] = { ...normalized, updatedAt: Date.now() };
     } else {
-      const index = profiles.findIndex(p => p.id === profile.id);
-      if (index !== -1) {
-        profiles[index] = { ...profiles[index], ...profile, updatedAt: Date.now() };
-      } else {
-        profiles.push(profile);
-      }
+      profiles.push(normalized);
     }
 
     await this.saveProfiles(profiles);
-    await this.setActiveProfileId(profile.id);
-    return profile;
+    await this.setActiveProfileId(normalized.id);
+    return normalized;
   },
 
   /**
@@ -137,6 +142,9 @@ const Storage = {
     });
   },
 
+  /**
+   * Obtiene el estado de selección visual pendiente
+   */
   async getPendingPick() {
     return new Promise((resolve) => {
       chrome.storage.local.get([this.KEYS.PENDING_PICK], (result) => {
@@ -145,6 +153,9 @@ const Storage = {
     });
   },
 
+  /**
+   * Limpia el estado de selección visual pendiente
+   */
   async clearPendingPick() {
     return new Promise((resolve) => {
       chrome.storage.local.remove([this.KEYS.PENDING_PICK], resolve);
@@ -180,10 +191,13 @@ const Storage = {
     if (!url) return null;
     try {
       const profiles = await this.getProfiles();
-      const currentHost = new URL(url).hostname.toLowerCase();
       
       const matched = profiles.find(p => {
+        if (typeof ProfileModel !== 'undefined' && typeof ProfileModel.matchesDomain === 'function') {
+          return ProfileModel.matchesDomain(p, url);
+        }
         if (!p.domain || !p.domain.trim()) return false;
+        const currentHost = new URL(url).hostname.toLowerCase();
         const cleanDomain = p.domain.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '');
         return currentHost.includes(cleanDomain) || cleanDomain.includes(currentHost);
       });
@@ -204,7 +218,11 @@ const Storage = {
   }
 };
 
-// Exportar globalmente para extension scripts
+// Exportar globalmente para extension scripts (Service Worker y Window)
+if (typeof globalThis !== 'undefined') {
+  globalThis.Storage = Storage;
+}
+
 if (typeof window !== 'undefined') {
   window.Storage = Storage;
 }
