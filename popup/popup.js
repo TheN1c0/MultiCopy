@@ -52,40 +52,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     },
 
     async getActiveTab() {
+      if (typeof TabService !== 'undefined') {
+        return TabService.getActiveTab();
+      }
       const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
       return tabs[0] || null;
     },
 
     async ensureContentScriptsInjected(tabId) {
-      return new Promise((resolve) => {
-        const pingAction = typeof ACTIONS !== 'undefined' ? ACTIONS.PING : 'PING';
-        chrome.tabs.sendMessage(tabId, { action: pingAction }, async (res) => {
-          if (chrome.runtime.lastError || !res) {
-            try {
-              await chrome.scripting.insertCSS({
-                target: { tabId },
-                files: ['content/content.css']
-              });
-              await chrome.scripting.executeScript({
-                target: { tabId },
-                files: [
-                  'utils/constants.js',
-                  'utils/models.js',
-                  'utils/storage.js',
-                  'utils/clipboard.js',
-                  'utils/selector.js',
-                  'utils/filler.js',
-                  'content/picker.js',
-                  'content/content.js'
-                ]
-              });
-            } catch (err) {
-              console.warn('Inyección de script:', err);
-            }
-          }
-          resolve();
-        });
-      });
+      if (typeof TabService !== 'undefined') {
+        return TabService.ensureContentScriptsInjected(tabId);
+      }
+      return true;
     }
   };
 

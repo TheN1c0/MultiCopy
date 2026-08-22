@@ -3,7 +3,7 @@
  * Gestiona eventos de fondo, atajos de teclado y reapertura automática del popup
  */
 
-importScripts('../utils/constants.js', '../utils/models.js', '../utils/storage.js');
+importScripts('../utils/constants.js', '../utils/models.js', '../utils/storage.js', '../utils/tabs.js');
 
 /**
  * Obtiene el perfil asociado al dominio de la URL o el perfil activo
@@ -57,42 +57,27 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 chrome.commands.onCommand.addListener(async (command) => {
   if (command === COMMANDS.FILL_FORM_SHORTCUT) {
     try {
-      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-      if (tabs && tabs[0] && tabs[0].id) {
-        const tabId = tabs[0].id;
-        const profile = await getProfileForUrlOrActive(tabs[0].url);
+      const tab = typeof TabService !== 'undefined'
+        ? await TabService.getActiveTab()
+        : (await chrome.tabs.query({ active: true, currentWindow: true }))[0];
 
-        chrome.tabs.sendMessage(tabId, {
+      if (tab && tab.id) {
+        const profile = await getProfileForUrlOrActive(tab.url);
+
+        chrome.tabs.sendMessage(tab.id, {
           action: ACTIONS.TRIGGER_FILL_WITH_PROFILE,
           profile: profile
-        }, async (res) => {
+        }, async () => {
           if (chrome.runtime.lastError) {
-            // Si la pestaña tenía un script huérfano por recarga de extensión, reinyectar y reintentar
-            try {
-              await chrome.scripting.insertCSS({
-                target: { tabId },
-                files: ['content/content.css']
-              });
-              await chrome.scripting.executeScript({
-                target: { tabId },
-                files: [
-                  'utils/constants.js',
-                  'utils/models.js',
-                  'utils/storage.js',
-                  'utils/clipboard.js',
-                  'utils/selector.js',
-                  'utils/filler.js',
-                  'content/picker.js',
-                  'content/content.js'
-                ]
-              });
-              // Reintentar rellenado tras inyección
-              chrome.tabs.sendMessage(tabId, {
-                action: ACTIONS.TRIGGER_FILL_WITH_PROFILE,
-                profile: profile
-              });
-            } catch (injectErr) {
-              console.warn('No se pudo inyectar automáticamente en la pestaña:', injectErr);
+            // Si la pestaña estaba desincronizada, inyectar con TabService y reintentar
+            if (typeof TabService !== 'undefined') {
+              const injected = await TabService.ensureContentScriptsInjected(tab.id);
+              if (injected) {
+                chrome.tabs.sendMessage(tab.id, {
+                  action: ACTIONS.TRIGGER_FILL_WITH_PROFILE,
+                  profile: profile
+                });
+              }
             }
           }
         });
