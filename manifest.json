@@ -38,6 +38,8 @@
     {
       "matches": ["<all_urls>"],
       "js": [
+        "utils/constants.js",
+        "utils/models.js",
         "utils/storage.js",
         "utils/clipboard.js",
         "utils/selector.js",

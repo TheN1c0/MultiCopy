@@ -3,7 +3,7 @@
  * Gestiona eventos de fondo, atajos de teclado y reapertura automática del popup
  */
 
-importScripts('../utils/storage.js');
+importScripts('../utils/constants.js', '../utils/models.js', '../utils/storage.js', '../utils/tabs.js');
 
 /**
  * Obtiene el perfil asociado al dominio de la URL o el perfil activo
@@ -25,7 +25,7 @@ async function getProfileForUrlOrActive(url) {
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === 'REOPEN_POPUP' || message.action === 'OPEN_POPUP') {
+  if (message.action === ACTIONS.REOPEN_POPUP || message.action === ACTIONS.OPEN_POPUP) {
     if (chrome.action && typeof chrome.action.openPopup === 'function') {
       chrome.action.openPopup()
         .then(() => {
@@ -41,7 +41,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
   }
 
-  if (message.action === 'GET_PROFILE_FOR_AUTOFILL') {
+  if (message.action === ACTIONS.GET_PROFILE_FOR_AUTOFILL) {
     getProfileForUrlOrActive(message.url)
       .then((profile) => {
         sendResponse({ status: 'ok', profile });
@@ -55,14 +55,31 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 // Listener para el atajo de teclado global (por defecto Ctrl + Shift + Y)
 chrome.commands.onCommand.addListener(async (command) => {
-  if (command === 'fill-form-shortcut') {
+  if (command === COMMANDS.FILL_FORM_SHORTCUT) {
     try {
-      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-      if (tabs && tabs[0] && tabs[0].id) {
-        const profile = await getProfileForUrlOrActive(tabs[0].url);
-        chrome.tabs.sendMessage(tabs[0].id, {
-          action: 'TRIGGER_FILL_WITH_PROFILE',
+      const tab = typeof TabService !== 'undefined'
+        ? await TabService.getActiveTab()
+        : (await chrome.tabs.query({ active: true, currentWindow: true }))[0];
+
+      if (tab && tab.id) {
+        const profile = await getProfileForUrlOrActive(tab.url);
+
+        chrome.tabs.sendMessage(tab.id, {
+          action: ACTIONS.TRIGGER_FILL_WITH_PROFILE,
           profile: profile
+        }, async () => {
+          if (chrome.runtime.lastError) {
+            // Si la pestaña estaba desincronizada, inyectar con TabService y reintentar
+            if (typeof TabService !== 'undefined') {
+              const injected = await TabService.ensureContentScriptsInjected(tab.id);
+              if (injected) {
+                chrome.tabs.sendMessage(tab.id, {
+                  action: ACTIONS.TRIGGER_FILL_WITH_PROFILE,
+                  profile: profile
+                });
+              }
+            }
+          }
         });
       }
     } catch (err) {

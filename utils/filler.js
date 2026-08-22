@@ -134,6 +134,32 @@ const FormFiller = {
     }
   },
 
+  // Grupos de sinónimos comunes para formularios
+  SYNONYMS: [
+    ['male', 'masculino', 'hombre', 'varon', 'm'],
+    ['female', 'femenino', 'mujer', 'f'],
+    ['other', 'otro', 'otra', 'no binario', 'non-binary', 'nb', 'otro/a'],
+    ['si', 'yes', 'true', '1', 'v', 'verdadero', 'ok', 'activo'],
+    ['no', 'false', '0', 'f', 'falso', 'inactivo']
+  ],
+
+  /**
+   * Comprueba si dos valores coinciden considerando sinónimos de género y valores booleanos
+   */
+  areSynonyms(val1, val2) {
+    if (!val1 || !val2) return false;
+    const n1 = this.normalizeText(val1);
+    const n2 = this.normalizeText(val2);
+    if (n1 === n2) return true;
+
+    for (const group of this.SYNONYMS) {
+      if (group.includes(n1) && group.includes(n2)) {
+        return true;
+      }
+    }
+    return false;
+  },
+
   /**
    * Maneja el rellenado de elementos <select>
    */
@@ -145,32 +171,34 @@ const FormFiller = {
     const targetNormalized = this.normalizeText(value);
     let matchedOption = null;
 
-    // Estrategia 1: Coincidencia exacta de valor o texto visible
+    // Pase 1: Coincidencia exacta de valor o texto
     for (const opt of selectElement.options) {
-      if (opt.value === value || opt.text.trim() === value) {
+      const valNorm = this.normalizeText(opt.value);
+      const textNorm = this.normalizeText(opt.text);
+      if (valNorm === targetNormalized || textNorm === targetNormalized || opt.value === value || opt.text.trim() === value) {
         matchedOption = opt;
         break;
       }
     }
 
-    // Estrategia 2: Coincidencia normalizada (sin tildes, minúsculas, espacios)
+    // Pase 2: Coincidencia por sinónimos (ej: "Masculino" <-> "Male", "Femenino" <-> "Female")
     if (!matchedOption) {
       for (const opt of selectElement.options) {
         const valNorm = this.normalizeText(opt.value);
         const textNorm = this.normalizeText(opt.text);
-
-        if (valNorm === targetNormalized || textNorm === targetNormalized) {
+        if (this.areSynonyms(targetNormalized, valNorm) || this.areSynonyms(targetNormalized, textNorm)) {
           matchedOption = opt;
           break;
         }
       }
     }
 
-    // Estrategia 3: Contiene el texto (subcadena)
+    // Pase 3: La opción de la web contiene el texto buscado como palabra completa o subcadena
     if (!matchedOption && targetNormalized.length > 2) {
       for (const opt of selectElement.options) {
         const textNorm = this.normalizeText(opt.text);
-        if (textNorm.includes(targetNormalized) || targetNormalized.includes(textNorm)) {
+        const valNorm = this.normalizeText(opt.value);
+        if (textNorm.includes(targetNormalized) || valNorm.includes(targetNormalized)) {
           matchedOption = opt;
           break;
         }
@@ -236,7 +264,7 @@ const FormFiller = {
       // Radio individual sin nombre de grupo
       const norm = this.normalizeText(value);
       const valNorm = this.normalizeText(radioElement.value);
-      if (valNorm === norm) {
+      if (valNorm === norm || this.areSynonyms(norm, valNorm)) {
         radioElement.checked = true;
         this.dispatchEvents(radioElement);
         return true;
@@ -249,8 +277,8 @@ const FormFiller = {
    * Busca y selecciona la opción correspondiente dentro de un grupo de radio buttons
    */
   fillRadioInGroup(radios, value) {
-    const norm = this.normalizeText(value);
-    const availableLabels = [];
+    const targetNorm = this.normalizeText(value);
+    const candidates = [];
 
     for (const radio of radios) {
       const valNorm = this.normalizeText(radio.value);
@@ -264,23 +292,53 @@ const FormFiller = {
         labelText = parentLabel.innerText.trim();
       }
 
-      if (labelText) availableLabels.push(`"${labelText}"`);
       const labelNorm = this.normalizeText(labelText);
+      candidates.push({ radio, valNorm, labelNorm, labelText });
+    }
 
-      if (valNorm === norm || (labelNorm && (labelNorm === norm || labelNorm.includes(norm) || norm.includes(labelNorm)))) {
-        const descriptor = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'checked');
-        if (descriptor && descriptor.set) {
-          descriptor.set.call(radio, true);
-        } else {
-          radio.checked = true;
-        }
-        this.dispatchEvents(radio);
-        return true;
+    let matchedRadio = null;
+
+    // Pase 1: Coincidencia exacta de valor o texto de etiqueta
+    for (const c of candidates) {
+      if (c.valNorm === targetNorm || c.labelNorm === targetNorm) {
+        matchedRadio = c.radio;
+        break;
       }
     }
 
-    const preview = availableLabels.slice(0, 3).join(', ');
-    throw new Error(`En Excel dice "${value}", pero no coincide con ninguna opción de radio (Opciones disponibles: ${preview || 'ninguna'})`);
+    // Pase 2: Coincidencia por sinónimos (ej: "Female" <-> "Femenino" <-> "Mujer", "Male" <-> "Masculino")
+    if (!matchedRadio) {
+      for (const c of candidates) {
+        if (this.areSynonyms(targetNorm, c.valNorm) || this.areSynonyms(targetNorm, c.labelNorm)) {
+          matchedRadio = c.radio;
+          break;
+        }
+      }
+    }
+
+    // Pase 3: La etiqueta contiene el texto buscado (pero NO al revés para evitar que "female" active "male")
+    if (!matchedRadio && targetNorm.length > 2) {
+      for (const c of candidates) {
+        if (c.labelNorm && c.labelNorm.includes(targetNorm)) {
+          matchedRadio = c.radio;
+          break;
+        }
+      }
+    }
+
+    if (matchedRadio) {
+      const descriptor = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'checked');
+      if (descriptor && descriptor.set) {
+        descriptor.set.call(matchedRadio, true);
+      } else {
+        matchedRadio.checked = true;
+      }
+      this.dispatchEvents(matchedRadio);
+      return true;
+    }
+
+    const available = candidates.map(c => `"${c.labelText || c.valNorm}"`).filter(Boolean).slice(0, 3).join(', ');
+    throw new Error(`En Excel dice "${value}", pero no coincide con ninguna opción de radio (Opciones: ${available || 'ninguna'})`);
   },
 
   /**
