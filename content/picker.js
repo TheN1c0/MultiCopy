@@ -188,7 +188,8 @@ const ElementPicker = {
    */
   requestReopenPopup() {
     try {
-      chrome.runtime.sendMessage({ action: 'REOPEN_POPUP' });
+      const actionName = typeof ACTIONS !== 'undefined' ? ACTIONS.REOPEN_POPUP : 'REOPEN_POPUP';
+      chrome.runtime.sendMessage({ action: actionName });
     } catch (err) {
       console.warn('MultiCopy: No se pudo enviar mensaje para reabrir popup:', err);
     }
@@ -198,9 +199,10 @@ const ElementPicker = {
    * Guarda o actualiza el campo en el perfil correspondiente
    */
   async saveSelectedField(profileId, fieldId, fieldData) {
+    const profilesKey = typeof STORAGE_KEYS !== 'undefined' ? STORAGE_KEYS.PROFILES : 'multicopy_profiles';
     return new Promise((resolve) => {
-      chrome.storage.local.get(['multicopy_profiles'], (res) => {
-        let profiles = res.multicopy_profiles || [];
+      chrome.storage.local.get([profilesKey], (res) => {
+        let profiles = res[profilesKey] || [];
         const profileIndex = profiles.findIndex(p => p.id === profileId);
 
         if (profileIndex !== -1) {
@@ -226,7 +228,7 @@ const ElementPicker = {
             });
           }
 
-          chrome.storage.local.set({ multicopy_profiles: profiles }, resolve);
+          chrome.storage.local.set({ [profilesKey]: profiles }, resolve);
         } else {
           resolve();
         }

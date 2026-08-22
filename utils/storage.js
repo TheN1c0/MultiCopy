@@ -4,8 +4,8 @@
  */
 
 const Storage = {
-  // Claves de almacenamiento
-  KEYS: {
+  // Claves de almacenamiento centralizadas
+  KEYS: typeof STORAGE_KEYS !== 'undefined' ? STORAGE_KEYS : {
     PROFILES: 'multicopy_profiles',
     ACTIVE_PROFILE_ID: 'multicopy_active_profile_id',
     PENDING_PICK: 'multicopy_pending_pick',

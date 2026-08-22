@@ -5,38 +5,48 @@
 
 // Escuchar mensajes desde el popup y background
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === 'START_PICKER') {
+  const actions = typeof ACTIONS !== 'undefined' ? ACTIONS : {
+    START_PICKER: 'START_PICKER',
+    STOP_PICKER: 'STOP_PICKER',
+    FILL_FORM: 'FILL_FORM',
+    TRIGGER_FILL_WITH_PROFILE: 'TRIGGER_FILL_WITH_PROFILE',
+    TRIGGER_SHORTCUT_FILL: 'TRIGGER_SHORTCUT_FILL',
+    GET_PROFILE_FOR_AUTOFILL: 'GET_PROFILE_FOR_AUTOFILL',
+    PING: 'PING'
+  };
+
+  if (request.action === actions.START_PICKER) {
     ElementPicker.start(request.context);
     sendResponse({ status: 'picker_started' });
     return true;
   }
 
-  if (request.action === 'STOP_PICKER') {
+  if (request.action === actions.STOP_PICKER) {
     ElementPicker.stop();
     sendResponse({ status: 'picker_stopped' });
     return true;
   }
 
-  if (request.action === 'FILL_FORM') {
+  if (request.action === actions.FILL_FORM) {
     const { fields, columns } = request;
     const results = fillFormFields(fields, columns);
     sendResponse({ status: 'completed', results });
     return true;
   }
 
-  if (request.action === 'TRIGGER_FILL_WITH_PROFILE') {
+  if (request.action === actions.TRIGGER_FILL_WITH_PROFILE) {
     executeAutofillWithProfile(request.profile);
     sendResponse({ status: 'triggered' });
     return true;
   }
 
-  if (request.action === 'TRIGGER_SHORTCUT_FILL') {
+  if (request.action === actions.TRIGGER_SHORTCUT_FILL) {
     requestProfileAndAutofill();
     sendResponse({ status: 'triggered' });
     return true;
   }
 
-  if (request.action === 'PING') {
+  if (request.action === actions.PING) {
     sendResponse({ status: 'ready', url: window.location.href, hostname: window.location.hostname });
     return true;
   }
@@ -46,13 +56,28 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
  * Solicita el perfil activo al background service worker y ejecuta el autofill
  */
 function requestProfileAndAutofill() {
+  if (!chrome || !chrome.runtime || !chrome.runtime.id) {
+    if (typeof ElementPicker !== 'undefined' && ElementPicker.showToast) {
+      ElementPicker.showToast('⚠️ MultiCopy se actualizó. Por favor recarga esta pestaña web (F5) para continuar.', true);
+    }
+    return;
+  }
+
   try {
+    const actionName = typeof ACTIONS !== 'undefined' ? ACTIONS.GET_PROFILE_FOR_AUTOFILL : 'GET_PROFILE_FOR_AUTOFILL';
     chrome.runtime.sendMessage({
-      action: 'GET_PROFILE_FOR_AUTOFILL',
+      action: actionName,
       url: window.location.href
     }, (response) => {
       if (chrome.runtime.lastError) {
-        console.warn('Error al comunicarse con background:', chrome.runtime.lastError);
+        const errMsg = chrome.runtime.lastError.message || '';
+        if (errMsg.includes('Extension context invalidated')) {
+          if (typeof ElementPicker !== 'undefined' && ElementPicker.showToast) {
+            ElementPicker.showToast('⚠️ MultiCopy se actualizó. Por favor recarga esta página (F5).', true);
+          }
+        } else {
+          console.warn('Error al comunicarse con background:', chrome.runtime.lastError);
+        }
         return;
       }
       if (response && response.profile) {
@@ -62,7 +87,13 @@ function requestProfileAndAutofill() {
       }
     });
   } catch (err) {
-    console.error('Error al solicitar perfil:', err);
+    if (err.message && err.message.includes('Extension context invalidated')) {
+      if (typeof ElementPicker !== 'undefined' && ElementPicker.showToast) {
+        ElementPicker.showToast('⚠️ MultiCopy se actualizó. Por favor recarga esta página (F5).', true);
+      }
+    } else {
+      console.error('Error al solicitar perfil:', err);
+    }
   }
 }
 

@@ -244,8 +244,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       await ensureContentScriptsInjected(activeTab.id);
 
       // Enviar mensaje para rellenar formulario
+      const fillAction = typeof ACTIONS !== 'undefined' ? ACTIONS.FILL_FORM : 'FILL_FORM';
       chrome.tabs.sendMessage(activeTab.id, {
-        action: 'FILL_FORM',
+        action: fillAction,
         fields: currentActiveProfile.fields,
         columns: clipboardData.columns
       }, (response) => {
@@ -512,8 +513,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       await ensureContentScriptsInjected(activeTab.id);
 
+      const startPickAction = typeof ACTIONS !== 'undefined' ? ACTIONS.START_PICKER : 'START_PICKER';
       chrome.tabs.sendMessage(activeTab.id, {
-        action: 'START_PICKER',
+        action: startPickAction,
         context: {
           profileId,
           fieldId,
@@ -605,9 +607,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const shortcutDisplay = document.getElementById('shortcut-display');
     const btnConfigureShortcut = document.getElementById('btn-configure-shortcut');
 
+    const shortcutCommandName = typeof COMMANDS !== 'undefined' ? COMMANDS.FILL_FORM_SHORTCUT : 'fill-form-shortcut';
     if (chrome.commands && chrome.commands.getAll) {
       chrome.commands.getAll((commands) => {
-        const fillCmd = commands.find(c => c.name === 'fill-form-shortcut');
+        const fillCmd = commands.find(c => c.name === shortcutCommandName);
         if (fillCmd && fillCmd.shortcut && shortcutDisplay) {
           shortcutDisplay.textContent = fillCmd.shortcut;
         }
@@ -628,7 +631,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function ensureContentScriptsInjected(tabId) {
     return new Promise((resolve) => {
-      chrome.tabs.sendMessage(tabId, { action: 'PING' }, async (res) => {
+      const pingAction = typeof ACTIONS !== 'undefined' ? ACTIONS.PING : 'PING';
+      chrome.tabs.sendMessage(tabId, { action: pingAction }, async (res) => {
         if (chrome.runtime.lastError || !res) {
           // Inyectar manualmente si no estaba cargado
           try {
@@ -639,6 +643,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             await chrome.scripting.executeScript({
               target: { tabId },
               files: [
+                'utils/constants.js',
                 'utils/storage.js',
                 'utils/clipboard.js',
                 'utils/selector.js',
