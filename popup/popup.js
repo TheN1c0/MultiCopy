@@ -411,18 +411,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       card.innerHTML = `
         <div class="list-item-info">
-          <span class="list-item-title">${field.name || `Dato #${idx + 1}`}</span>
-          <span class="list-item-sub">Dato de la fila: <strong>#${colNum}</strong> • ${statusBadge}</span>
-          <span class="list-item-sub" style="font-family: monospace; font-size: 10px; color: var(--text-muted);">${field.selector || 'Sin asignar'}</span>
+          <span class="list-item-title">${field.name || `Campo ${idx + 1}`}</span>
+          <span class="list-item-sub">Dato de la fila: <strong>${colNum}</strong> · ${statusBadge}</span>
         </div>
         <div class="list-item-actions">
-          <button class="btn-accent btn-sm btn-pill btn-pick-row" data-id="${field.id}" title="Elegir campo en la página">
+          <button class="btn-accent btn-sm btn-pill btn-pick-row" data-id="${field.id}" title="Volver a vincular" aria-label="Volver a vincular">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="22" y1="12" x2="18" y2="12"></line><line x1="6" y1="12" x2="2" y2="12"></line><line x1="12" y1="6" x2="12" y2="2"></line><line x1="12" y1="22" x2="12" y2="18"></line></svg>
           </button>
-          <button class="btn-secondary btn-sm btn-pill btn-edit-field" data-id="${field.id}" title="Editar">
+          <button class="btn-secondary btn-sm btn-pill btn-edit-field" data-id="${field.id}" title="Editar" aria-label="Editar">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
           </button>
-          <button class="btn-danger-ghost btn-sm btn-delete-field" data-id="${field.id}" title="Eliminar">
+          <button class="btn-danger-ghost btn-sm btn-delete-field" data-id="${field.id}" title="Eliminar" aria-label="Eliminar">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
           </button>
         </div>
@@ -601,6 +600,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       const name = inputFieldName.value.trim() || `Dato #${colIdx + 1}`;
       triggerVisualPicker(currentEditingProfileId, editFieldId.value || null, name, colIdx);
     });
+
+    // Configuración y visualización del atajo de teclado
+    const shortcutDisplay = document.getElementById('shortcut-display');
+    const btnConfigureShortcut = document.getElementById('btn-configure-shortcut');
+
+    if (chrome.commands && chrome.commands.getAll) {
+      chrome.commands.getAll((commands) => {
+        const fillCmd = commands.find(c => c.name === 'fill-form-shortcut');
+        if (fillCmd && fillCmd.shortcut && shortcutDisplay) {
+          shortcutDisplay.textContent = fillCmd.shortcut;
+        }
+      });
+    }
+
+    if (btnConfigureShortcut) {
+      btnConfigureShortcut.addEventListener('click', () => {
+        chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
+      });
+    }
   }
 
   async function getActiveTab() {
@@ -621,6 +639,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             await chrome.scripting.executeScript({
               target: { tabId },
               files: [
+                'utils/storage.js',
+                'utils/clipboard.js',
                 'utils/selector.js',
                 'utils/filler.js',
                 'content/picker.js',

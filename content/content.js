@@ -3,7 +3,7 @@
  * Recibe mensajes desde el Popup para iniciar la selección visual o rellenar el formulario.
  */
 
-// Escuchar mensajes desde el popup
+// Escuchar mensajes desde el popup y background
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'START_PICKER') {
     ElementPicker.start(request.context);
@@ -24,11 +24,119 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
   }
 
+  if (request.action === 'TRIGGER_FILL_WITH_PROFILE') {
+    executeAutofillWithProfile(request.profile);
+    sendResponse({ status: 'triggered' });
+    return true;
+  }
+
+  if (request.action === 'TRIGGER_SHORTCUT_FILL') {
+    requestProfileAndAutofill();
+    sendResponse({ status: 'triggered' });
+    return true;
+  }
+
   if (request.action === 'PING') {
     sendResponse({ status: 'ready', url: window.location.href, hostname: window.location.hostname });
     return true;
   }
 });
+
+/**
+ * Solicita el perfil activo al background service worker y ejecuta el autofill
+ */
+function requestProfileAndAutofill() {
+  try {
+    chrome.runtime.sendMessage({
+      action: 'GET_PROFILE_FOR_AUTOFILL',
+      url: window.location.href
+    }, (response) => {
+      if (chrome.runtime.lastError) {
+        console.warn('Error al comunicarse con background:', chrome.runtime.lastError);
+        return;
+      }
+      if (response && response.profile) {
+        executeAutofillWithProfile(response.profile);
+      } else {
+        ElementPicker.showToast('⚠️ MultiCopy: No hay un perfil activo seleccionado. Abre la extensión para elegir uno.', true);
+      }
+    });
+  } catch (err) {
+    console.error('Error al solicitar perfil:', err);
+  }
+}
+
+/**
+ * Ejecuta el rellenado con un perfil dado y la última fila del portapapeles
+ */
+async function executeAutofillWithProfile(profile) {
+  try {
+    if (!profile) {
+      ElementPicker.showToast('⚠️ MultiCopy: No hay un perfil activo seleccionado. Abre la extensión para elegir uno.', true);
+      return;
+    }
+
+    if (!profile.fields || profile.fields.length === 0) {
+      ElementPicker.showToast(`⚠️ MultiCopy: El perfil "${profile.name}" no tiene campos configurados.`, true);
+      return;
+    }
+
+    // 1. Leer el portapapeles
+    let rawText = '';
+    try {
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        rawText = await navigator.clipboard.readText();
+      }
+    } catch (_) {}
+
+    if (!rawText && typeof ClipboardParser !== 'undefined' && ClipboardParser.readClipboard) {
+      try {
+        rawText = await ClipboardParser.readClipboard();
+      } catch (_) {}
+    }
+
+    if (!rawText || rawText.trim() === '') {
+      ElementPicker.showToast('⚠️ MultiCopy: El portapapeles está vacío. Copia una fila en Excel primero.', true);
+      return;
+    }
+
+    // 2. Parsear fila
+    let columns = [];
+    if (typeof ClipboardParser !== 'undefined' && ClipboardParser.parseExcelText) {
+      const parsed = ClipboardParser.parseExcelText(rawText);
+      columns = parsed.columns || [];
+    } else {
+      const line = rawText.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n')[0] || '';
+      columns = line.split('\t');
+    }
+
+    if (!columns || columns.length === 0) {
+      ElementPicker.showToast('⚠️ MultiCopy: No se detectaron datos en la fila copiada.', true);
+      return;
+    }
+
+    // 3. Rellenar formulario
+    fillFormFields(profile.fields, columns);
+
+  } catch (err) {
+    console.error('MultiCopy autofill error:', err);
+    ElementPicker.showToast(`⚠️ Error al rellenar: ${err.message}`, true);
+  }
+}
+
+// Listener de teclado directo en la ventana activa (Ctrl+Shift+Y o Cmd+Shift+Y)
+window.addEventListener('keydown', (e) => {
+  if (window.ElementPicker && window.ElementPicker.isActive) return;
+
+  const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+  const modifier = isMac ? e.metaKey : e.ctrlKey;
+
+  // Atajo: Ctrl + Shift + Y
+  if (modifier && e.shiftKey && (e.key === 'Y' || e.key === 'y' || e.code === 'KeyY')) {
+    e.preventDefault();
+    requestProfileAndAutofill();
+  }
+}, true);
 
 /**
  * Rellena los campos de la página web según la configuración del perfil

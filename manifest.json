@@ -25,10 +25,21 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
+  "commands": {
+    "fill-form-shortcut": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      },
+      "description": "Rellenar formulario con la fila copiada"
+    }
+  },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
       "js": [
+        "utils/storage.js",
+        "utils/clipboard.js",
         "utils/selector.js",
         "utils/filler.js",
         "content/picker.js",

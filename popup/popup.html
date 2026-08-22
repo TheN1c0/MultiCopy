@@ -93,6 +93,10 @@
           RELLENAR FORMULARIO
         </button>
         <div id="fill-feedback" class="feedback-msg"></div>
+        <div class="shortcut-info-bar">
+          <span>⚡ Atajo rápido: <kbd id="shortcut-display">Ctrl+Shift+Y</kbd></span>
+          <button id="btn-configure-shortcut" class="btn-link" type="button" title="Personalizar atajo de teclado en Chrome">Cambiar</button>
+        </div>
       </section>
     </main>
 
@@ -135,42 +139,37 @@
         <h2 id="fields-view-title">Campos del Perfil</h2>
       </div>
 
-      <!-- Configuración de Dominio Opcional -->
-      <div class="domain-binding-card">
-        <label class="section-label" for="input-profile-domain">● DOMINIO / URL ASOCIADA (OPCIONAL)</label>
-        <div class="input-action-group">
-          <input type="text" id="input-profile-domain" class="form-control" placeholder="Ej: empresa.cl o mi-sitio.com">
-          <button id="btn-save-domain" class="btn-secondary btn-sm">Guardar</button>
-        </div>
-      </div>
-
       <!-- Formulario para agregar / editar campo -->
       <div class="field-editor-card">
-        <h3 id="field-form-title" style="font-family: var(--font-mono); font-size: 13px; margin-bottom: 10px;">Agregar nuevo campo</h3>
+        <h3 id="field-form-title" style="font-family: var(--font-mono); font-size: 12.5px; margin-bottom: 8px;">Agregar nuevo campo</h3>
         <input type="hidden" id="edit-field-id" value="">
         
         <div class="form-group">
-          <label class="field-label" for="input-field-name">Nombre / Etiqueta del campo</label>
-          <input type="text" id="input-field-name" class="form-control" placeholder="Ej: RUT, Nombre, Correo...">
+          <label class="field-label" for="input-field-name">Nombre del campo</label>
+          <input type="text" id="input-field-name" class="form-control" placeholder="Ej: RUT, Nombre, Email, Teléfono...">
         </div>
 
         <div class="form-row-2">
           <div class="form-group">
-            <label class="field-label" for="input-column-index">Dato de la fila (1 = 1º, 2 = 2º...)</label>
-            <input type="number" id="input-column-index" class="form-control" min="1" max="100" value="1" title="Posición en la fila copiada (1 = primer dato, 2 = segundo, etc.)">
+            <label class="field-label" for="input-column-index">
+              Dato de la fila
+              <span class="info-tooltip-icon" title="Indica qué dato de la fila copiada quieres utilizar. 1 = primer dato, 2 = segundo dato, 3 = tercero...">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+              </span>
+            </label>
+            <input type="number" id="input-column-index" class="form-control" min="1" max="100" value="1">
           </div>
           <div class="form-group">
-            <label class="field-label">Vincular con la página</label>
-            <button id="btn-start-pick-element" class="btn-accent btn-block" type="button">
+            <label class="field-label">Elegir en la página</label>
+            <button id="btn-start-pick-element" class="btn-accent btn-block" type="button" title="Haz clic aquí y luego en el campo que quieres rellenar en tu formulario web">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="22" y1="12" x2="18" y2="12"></line><line x1="6" y1="12" x2="2" y2="12"></line><line x1="12" y1="6" x2="12" y2="2"></line><line x1="12" y1="22" x2="12" y2="18"></line></svg>
               Elegir campo
             </button>
           </div>
-        </div>
-
-        <div class="form-group">
-          <label class="field-label" for="input-field-selector">Identificador del campo en web</label>
-          <input type="text" id="input-field-selector" class="form-control form-control-sm" placeholder="Se genera automáticamente al elegir el campo">
         </div>
 
         <div class="card-footer-buttons">
@@ -192,6 +191,30 @@
           <!-- Rellenado dinámicamente -->
         </div>
       </div>
+
+      <!-- Configuración Avanzada Colapsable -->
+      <details class="advanced-settings">
+        <summary class="advanced-summary">
+          <span>⚙ Configuración avanzada</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </summary>
+        <div class="advanced-content">
+          <!-- Configuración de Dominio Opcional -->
+          <div class="form-group">
+            <label class="field-label" for="input-profile-domain">Dominio / URL asociada (opcional)</label>
+            <div class="input-action-group">
+              <input type="text" id="input-profile-domain" class="form-control form-control-sm" placeholder="Ej: empresa.cl o mi-sitio.com">
+              <button id="btn-save-domain" class="btn-secondary btn-sm">Guardar</button>
+            </div>
+          </div>
+
+          <!-- Selector Técnico CSS (Manual) -->
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="field-label" for="input-field-selector">Identificador técnico del campo (CSS)</label>
+            <input type="text" id="input-field-selector" class="form-control form-control-sm" placeholder="Autogenerado al elegir el campo en la web">
+          </div>
+        </div>
+      </details>
     </main>
 
     <!-- Footer -->

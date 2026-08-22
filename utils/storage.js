@@ -172,6 +172,29 @@ const Storage = {
   },
 
   /**
+   * Obtiene el perfil vinculado a la URL o dominio si existe
+   * @param {string} url 
+   * @returns {Promise<Object|null>}
+   */
+  async getProfileForUrl(url) {
+    if (!url) return null;
+    try {
+      const profiles = await this.getProfiles();
+      const currentHost = new URL(url).hostname.toLowerCase();
+      
+      const matched = profiles.find(p => {
+        if (!p.domain || !p.domain.trim()) return false;
+        const cleanDomain = p.domain.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+        return currentHost.includes(cleanDomain) || cleanDomain.includes(currentHost);
+      });
+
+      return matched || null;
+    } catch (_) {
+      return null;
+    }
+  },
+
+  /**
    * Limpia el estado de la última vista
    */
   async clearLastViewState() {

@@ -236,12 +236,28 @@ body {
 }
 
 .field-label {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 4px;
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 600;
   color: var(--text-secondary);
   margin-bottom: 4px;
+}
+
+.info-tooltip-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  cursor: help;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.info-tooltip-icon:hover {
+  color: var(--text-main);
+  transform: scale(1.15);
 }
 
 .form-row-2 {
@@ -545,6 +561,53 @@ button {
   margin-bottom: 8px;
 }
 
+/* Configuración Avanzada Colapsable */
+.advanced-settings {
+  background: var(--bg-card);
+  border: 1px solid var(--border-paper);
+  border-radius: var(--radius-md);
+  margin-top: 8px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.advanced-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+}
+
+.advanced-summary::-webkit-details-marker {
+  display: none;
+}
+
+.advanced-summary:hover {
+  color: var(--text-main);
+  background: var(--bg-card-hover);
+}
+
+.advanced-content {
+  padding: 8px 10px;
+  border-top: 1px dashed var(--border-paper);
+  background: var(--bg-paper);
+}
+
+.advanced-summary svg {
+  transition: transform 0.2s ease;
+}
+
+.advanced-settings[open] .advanced-summary svg {
+  transform: rotate(180deg);
+}
+
 .card-footer-buttons {
   display: flex;
   justify-content: flex-end;
@@ -571,6 +634,47 @@ button {
 
 .feedback-msg:empty {
   display: none;
+}
+
+.shortcut-info-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--text-secondary);
+}
+
+.shortcut-info-bar kbd {
+  background: #fff;
+  border: 1px solid var(--border-paper);
+  border-bottom: 2px solid var(--border-paper);
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  transition: color 0.15s ease;
+}
+
+.btn-link:hover {
+  color: var(--accent-stamp);
 }
 
 .app-footer {
