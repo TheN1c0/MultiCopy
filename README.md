@@ -34,19 +34,24 @@ MultiCopy es una extensión para navegadores basados en Chromium (Google Chrome,
 
 ```text
 MultiCopy/
-├── manifest.json                  # Manifiesto Chrome MV3
-├── icons/                         # Iconos oficiales (16, 48, 128)
+├── manifest.json                  # Manifiesto Chromium MV3 (Chrome / Edge)
+├── PRIVACY.md                     # Política de Privacidad oficial para las tiendas
+├── icono.png                      # Logo original en alta resolución (1254x1254 px)
+├── icons/                         # Iconos oficiales del paquete (16, 32, 48, 128 px)
+├── store_assets/                  # Recursos para tiendas (Edge 300px, 512px, Banners 440x280 y 1400x560)
+├── generate_store_assets.ps1      # Script de generación de iconos y banners promocionales
+├── package_extension.ps1          # Script para compilar el ZIP de producción (multicopy_extension.zip)
 ├── utils/                         # Capa de Lógica y Servicios Compartidos
 │   ├── constants.js               # Protocolo de mensajería (ACTIONS), STORAGE_KEYS y COMMANDS
 │   ├── models.js                  # Modelos y validación de datos (FieldModel y ProfileModel)
 │   ├── storage.js                 # Capa de persistencia con normalización automática
 │   ├── tabs.js                    # TabService: gestión de pestañas e inyección garantizada
-│   ├── clipboard.js               # Parser TSV y lectura del portapapeles
+│   ├── clipboard.js               # Parser TSV y lectura segura del portapapeles
 │   ├── selector.js                # Generador de selectores CSS robustos y nombres amigables
 │   └── filler.js                  # FormFiller: motor de rellenado DOM multi-estrategia
 ├── popup/                         # Interfaz de Usuario (Popup)
 │   ├── popup.html                 # Estructura HTML de vistas (Main, Profiles, Fields)
-│   ├── popup.css                  # Sistema de diseño Lo-Fi Warm Paper
+│   ├── popup.css                  # Sistema de diseño Lo-Fi Warm Paper (100% fuentes del sistema)
 │   ├── popup.js                   # Coordinador principal ligero de la aplicación
 │   └── controllers/               # Controladores modulares por vista
 │       ├── main-view.js           # Vista Principal (Portapapeles, selector y rellenado)
@@ -59,7 +64,9 @@ MultiCopy/
 ├── background/
 │   └── background.js              # Service Worker (atajos globales, auto-inyección y mensajes)
 └── test/
-    └── test-form.html             # Formulario completo para pruebas y validación local
+    ├── test-form.html             # Formulario completo para pruebas y validación local
+    ├── create_excel.js            # Generador de planillas de prueba (.xlsx y .csv)
+    └── datos_prueba.xlsx          # Planilla de prueba con datos simulados
 ```
 
 ---
@@ -143,19 +150,32 @@ Al incorporar nuevas funcionalidades o realizar mantenimiento, sigue estos linea
 
 ---
 
-## 🔧 Instalación y Pruebas
+## 🔧 Instalación y Pruebas en Desarrollo
 
-1. Abre Google Chrome o Microsoft Edge y navega a `chrome://extensions/`.
+1. Abre Google Chrome (`chrome://extensions/`) o Microsoft Edge (`edge://extensions/`).
 2. Activa el **Modo de desarrollador** (esquina superior derecha).
 3. Haz clic en **Cargar descomprimida** y selecciona la carpeta raíz del proyecto (`MultiCopy`).
-4. Abre el archivo de prueba `test/test-form.html` en el navegador para verificar la vinculación visual, el rellenado con botón y el rellenado con atajo (`Ctrl + Shift + Y`).
+4. Abre el archivo de prueba [`test/test-form.html`](test/test-form.html) en el navegador para verificar la vinculación visual, el rellenado con botón y el atajo (`Ctrl + Shift + Y`).
+
+---
+
+## 📦 Empaquetado para Publicación (Chrome & Edge)
+
+Para generar el archivo ZIP limpio listo para subir a **Chrome Web Store Developer Dashboard** y **Microsoft Partner Center**:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\package_extension.ps1
+```
+
+Esto generará el archivo `multicopy_extension.zip` conteniendo únicamente los archivos de producción (`manifest.json`, `background/`, `content/`, `popup/`, `utils/`, `icons/`).
 
 ---
 
 ## 🛡️ Privacidad y Seguridad
 
-- **0 dependencias externas:** No requiere librerías pesadas ni conexiones externas.
-- **Sin telemetría ni analíticas:** Todo el procesamiento ocurre de manera local y aislada en el navegador del usuario.
+- **100% Procesamiento Local:** Todo el rellenado y parseo de celdas ocurre en la memoria del navegador.
+- **0 Conexiones Externas:** Sin servidores de analítica, sin telemetría y sin dependencias remotas.
+- **Política de Privacidad Oficial:** Consulta el documento [`PRIVACY.md`](PRIVACY.md).
 
 ---
 
