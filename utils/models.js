@@ -13,6 +13,45 @@ const FieldModel = {
   },
 
   /**
+   * Convierte un índice numérico 0-based a letra de Excel (0 -> A, 1 -> B, 25 -> Z, 26 -> AA)
+   * @param {number} index 
+   * @returns {string}
+   */
+  indexToLetter(index) {
+    if (typeof index !== 'number' || isNaN(index) || index < 0) return 'A';
+    let num = Math.floor(index) + 1;
+    let letter = '';
+    while (num > 0) {
+      const rem = (num - 1) % 26;
+      letter = String.fromCharCode(65 + rem) + letter;
+      num = Math.floor((num - 1) / 26);
+    }
+    return letter;
+  },
+
+  /**
+   * Convierte una letra de columna de Excel a índice 0-based ('A' -> 0, 'B' -> 1, 'AA' -> 26)
+   * También acepta números directamente si el usuario los escribe.
+   * @param {string|number} str 
+   * @returns {number}
+   */
+  letterToIndex(str) {
+    if (str === undefined || str === null || str === '') return 0;
+    const clean = String(str).trim().toUpperCase();
+    if (/^\d+$/.test(clean)) {
+      return Math.max(0, parseInt(clean, 10) - 1);
+    }
+    let num = 0;
+    for (let i = 0; i < clean.length; i++) {
+      const code = clean.charCodeAt(i);
+      if (code >= 65 && code <= 90) {
+        num = num * 26 + (code - 64);
+      }
+    }
+    return Math.max(0, num - 1);
+  },
+
+  /**
    * Crea y normaliza un objeto Field
    * @param {Object} data 
    * @returns {Object}

@@ -1,5 +1,4 @@
 /* MultiCopy - Lo-Fi Paper & Notebook Aesthetic */
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
   /* Paleta Lo-Fi / Warm Paper */
@@ -36,14 +35,31 @@
   --radius-lg: 14px;
   --radius-pill: 9999px;
   
-  --font-mono: 'JetBrains Mono', 'Courier New', Courier, monospace;
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Cascadia Code', 'Segoe UI Mono', Consolas, 'Courier New', Courier, monospace;
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
+}
+
+input, textarea, [contenteditable="true"] {
+  user-select: text;
+  -webkit-user-select: text;
+  cursor: text;
+}
+
+button, a, select, input[type="checkbox"], input[type="radio"], summary, label, .btn-link, .info-tooltip-icon, .stepper-btn {
+  cursor: pointer;
+}
+
+label[for] {
+  cursor: pointer;
 }
 
 html {
@@ -67,6 +83,9 @@ body {
   font-size: 12.5px;
   line-height: 1.4;
   overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
 }
 
 /* Scrollbars discretos para listas internas */
@@ -557,8 +576,163 @@ button {
   background: var(--bg-card);
   border: 1px solid var(--border-paper);
   border-radius: var(--radius-md);
-  padding: 9px 10px;
+  padding: 10px 12px;
   margin-bottom: 8px;
+}
+
+/* Nuevo layout de 2 columnas para configuración de dato de la fila */
+.column-config-row {
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  gap: 10px;
+  align-items: start;
+  margin-bottom: 12px;
+}
+
+.column-left-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.column-right-box {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Stepper para columnas (Letras o Números) */
+.stepper-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.stepper-input {
+  padding-right: 22px !important;
+  font-family: var(--font-mono) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  text-align: center;
+  height: 34px !important;
+}
+
+.stepper-buttons {
+  position: absolute;
+  right: 3px;
+  top: 3px;
+  bottom: 3px;
+  width: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.stepper-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  font-size: 7.5px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  border-radius: 2px;
+  transition: all 0.15s ease;
+}
+
+.stepper-btn:hover {
+  color: var(--text-main);
+  background: var(--bg-card-hover);
+}
+
+/* Casilla de conversión estilizada */
+.checkbox-label-styled {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-label-styled input[type="checkbox"] {
+  margin-top: 2px;
+  accent-color: var(--accent-yellow-text);
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.checkbox-text-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.checkbox-main-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.checkbox-subtext {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-secondary);
+}
+
+/* Banner azul de aviso de inicio en primera columna */
+.column-assumption-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  background: #eef6fa;
+  border: 1px solid #c9e2ef;
+  border-radius: var(--radius-sm);
+  padding: 4px 7px;
+  margin-top: 6px;
+  font-size: 9px;
+  color: #2b5973;
+  line-height: 1.35;
+}
+
+.column-assumption-banner svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: #3b7b9e;
+}
+
+/* Fila de acciones (Elegir campo a la izq, Guardar a la der) */
+.field-actions-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 10px;
+  padding-top: 2px;
+}
+
+.pick-action-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.btn-pick-large {
+  padding: 6px 13px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.save-action-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 /* Configuración Avanzada Colapsable */
@@ -691,6 +865,21 @@ button {
 
 .app-footer strong {
   color: var(--text-main);
+}
+
+.app-footer a, .footer-link {
+  color: var(--text-main);
+  text-decoration: underline;
+  text-decoration-color: var(--accent-stamp, #d46b5a);
+  text-underline-offset: 2px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.app-footer a:hover, .footer-link:hover {
+  color: var(--accent-stamp, #d46b5a);
+  text-decoration-color: var(--text-main);
 }
 
 .hidden {

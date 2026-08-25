@@ -10,3 +10,7 @@ package-lock.json
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# Build & Package artifacts
+*.zip
+temp_package/
