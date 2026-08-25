@@ -1,5 +1,4 @@
 /* MultiCopy - Lo-Fi Paper & Notebook Aesthetic */
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
   /* Paleta Lo-Fi / Warm Paper */
@@ -36,8 +35,8 @@
   --radius-lg: 14px;
   --radius-pill: 9999px;
   
-  --font-mono: 'JetBrains Mono', 'Courier New', Courier, monospace;
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Cascadia Code', 'Segoe UI Mono', Consolas, 'Courier New', Courier, monospace;
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
 * {

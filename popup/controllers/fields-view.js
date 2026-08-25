@@ -193,33 +193,55 @@ const FieldsViewController = {
         ? FieldModel.indexToLetter(colIdx)
         : (colIdx + 1);
 
-      const statusBadge = field.selector 
-        ? '<span style="color:var(--success); font-weight: 600;">✓ Vinculado</span>' 
-        : '<span style="color:var(--warning); font-weight: 600;">Sin vincular</span>';
+      const infoDiv = document.createElement('div');
+      infoDiv.className = 'list-item-info';
 
-      card.innerHTML = `
-        <div class="list-item-info">
-          <span class="list-item-title">${field.name || `Campo ${idx + 1}`}</span>
-          <span class="list-item-sub">Dato de la fila: <strong>${colDisplay}</strong> · ${statusBadge}</span>
-        </div>
-        <div class="list-item-actions">
-          <button class="btn-accent btn-sm btn-pill btn-pick-row" data-id="${field.id}" title="Volver a vincular" aria-label="Volver a vincular">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="22" y1="12" x2="18" y2="12"></line><line x1="6" y1="12" x2="2" y2="12"></line><line x1="12" y1="6" x2="12" y2="2"></line><line x1="12" y1="22" x2="12" y2="18"></line></svg>
-          </button>
-          <button class="btn-secondary btn-sm btn-pill btn-edit-field" data-id="${field.id}" title="Editar" aria-label="Editar">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-          </button>
-          <button class="btn-danger-ghost btn-sm btn-delete-field" data-id="${field.id}" title="Eliminar" aria-label="Eliminar">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-          </button>
-        </div>
-      `;
+      const titleSpan = document.createElement('span');
+      titleSpan.className = 'list-item-title';
+      titleSpan.textContent = field.name || `Campo ${idx + 1}`;
 
-      card.querySelector('.btn-pick-row').addEventListener('click', () => {
+      const subSpan = document.createElement('span');
+      subSpan.className = 'list-item-sub';
+      subSpan.appendChild(document.createTextNode('Dato de la fila: '));
+      const strongCol = document.createElement('strong');
+      strongCol.textContent = String(colDisplay);
+      subSpan.appendChild(strongCol);
+      subSpan.appendChild(document.createTextNode(' · '));
+
+      const badgeSpan = document.createElement('span');
+      badgeSpan.style.fontWeight = '600';
+      if (field.selector) {
+        badgeSpan.style.color = 'var(--accent-green, #5a8a6e)';
+        badgeSpan.textContent = '✓ Vinculado';
+      } else {
+        badgeSpan.style.color = 'var(--accent-stamp, #d46b5a)';
+        badgeSpan.textContent = 'Sin vincular';
+      }
+      subSpan.appendChild(badgeSpan);
+
+      infoDiv.appendChild(titleSpan);
+      infoDiv.appendChild(subSpan);
+
+      const actionsDiv = document.createElement('div');
+      actionsDiv.className = 'list-item-actions';
+
+      const pickBtn = document.createElement('button');
+      pickBtn.className = 'btn-accent btn-sm btn-pill btn-pick-row';
+      pickBtn.dataset.id = field.id;
+      pickBtn.title = 'Volver a vincular';
+      pickBtn.setAttribute('aria-label', 'Volver a vincular');
+      pickBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="22" y1="12" x2="18" y2="12"></line><line x1="6" y1="12" x2="2" y2="12"></line><line x1="12" y1="6" x2="12" y2="2"></line><line x1="12" y1="22" x2="12" y2="18"></line></svg>';
+      pickBtn.addEventListener('click', () => {
         this.triggerVisualPicker(profile.id, field.id, field.name, field.columnIndex);
       });
 
-      card.querySelector('.btn-edit-field').addEventListener('click', () => {
+      const editBtn = document.createElement('button');
+      editBtn.className = 'btn-secondary btn-sm btn-pill btn-edit-field';
+      editBtn.dataset.id = field.id;
+      editBtn.title = 'Editar';
+      editBtn.setAttribute('aria-label', 'Editar');
+      editBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>';
+      editBtn.addEventListener('click', () => {
         this.dom.editFieldId.value = field.id;
         this.dom.inputFieldName.value = field.name || '';
         this.currentColumnIndex = parseInt(field.columnIndex, 10) || 0;
@@ -231,12 +253,25 @@ const FieldsViewController = {
         this.dom.btnCancelEditField.classList.remove('hidden');
       });
 
-      card.querySelector('.btn-delete-field').addEventListener('click', async () => {
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'btn-danger-ghost btn-sm btn-delete-field';
+      deleteBtn.dataset.id = field.id;
+      deleteBtn.title = 'Eliminar';
+      deleteBtn.setAttribute('aria-label', 'Eliminar');
+      deleteBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>';
+      deleteBtn.addEventListener('click', async () => {
         profile.fields = profile.fields.filter(f => f.id !== field.id);
         await Storage.saveProfile(profile);
         await this.app.reloadState();
         this.renderFieldsList(profile);
       });
+
+      actionsDiv.appendChild(pickBtn);
+      actionsDiv.appendChild(editBtn);
+      actionsDiv.appendChild(deleteBtn);
+
+      card.appendChild(infoDiv);
+      card.appendChild(actionsDiv);
 
       this.dom.fieldsList.appendChild(card);
     });

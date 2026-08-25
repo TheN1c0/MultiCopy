@@ -85,7 +85,9 @@ const MainViewController = {
 
     if (this.dom.btnConfigureShortcut) {
       this.dom.btnConfigureShortcut.addEventListener('click', () => {
-        chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
+        const isEdge = navigator.userAgent.includes('Edg/');
+        const shortcutsUrl = isEdge ? 'edge://extensions/shortcuts' : 'chrome://extensions/shortcuts';
+        chrome.tabs.create({ url: shortcutsUrl });
       });
     }
   },
@@ -179,10 +181,18 @@ const MainViewController = {
       const mappedField = fields.find(f => parseInt(f.columnIndex, 10) === idx);
       const colLabel = mappedField ? `${mappedField.name} (Dato #${idx + 1})` : `Dato #${idx + 1}`;
 
-      item.innerHTML = `
-        <span class="preview-col-name" title="${colLabel}">${colLabel}</span>
-        <span class="preview-col-val" title="${val}">${val || '<vacío>'}</span>
-      `;
+      const colNameSpan = document.createElement('span');
+      colNameSpan.className = 'preview-col-name';
+      colNameSpan.title = colLabel;
+      colNameSpan.textContent = colLabel;
+
+      const colValSpan = document.createElement('span');
+      colValSpan.className = 'preview-col-val';
+      colValSpan.title = val || '';
+      colValSpan.textContent = val || '<vacío>';
+
+      item.appendChild(colNameSpan);
+      item.appendChild(colValSpan);
       this.dom.previewList.appendChild(item);
     });
   },
@@ -206,7 +216,7 @@ const MainViewController = {
     }
 
     this.dom.btnFillForm.disabled = true;
-    this.dom.btnFillForm.innerHTML = '⏳ Rellenando...';
+    this.dom.btnFillForm.textContent = '⏳ Rellenando...';
 
     const activeTab = await this.app.getActiveTab();
     if (!activeTab || !activeTab.id) {
@@ -248,7 +258,7 @@ const MainViewController = {
 
   resetFillButton() {
     this.dom.btnFillForm.disabled = false;
-    this.dom.btnFillForm.innerHTML = 'RELLENAR FORMULARIO';
+    this.dom.btnFillForm.textContent = 'RELLENAR FORMULARIO';
   },
 
   showFeedback(msg, isError = false, duration = isError ? 15000 : 7000) {

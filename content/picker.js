@@ -68,9 +68,14 @@ const ElementPicker = {
     
     this.bannerEl.innerHTML = `
       <span class="multicopy-badge">MultiCopy</span>
-      <span>Haz clic en el campo que quieres rellenar: <span class="multicopy-target-info">${label}</span></span>
+      <span>Haz clic en el campo que quieres rellenar: <span class="multicopy-target-info"></span></span>
       <button class="multicopy-cancel-btn" id="multicopy-cancel-pick">Cancelar (ESC)</button>
     `;
+
+    const targetInfoSpan = this.bannerEl.querySelector('.multicopy-target-info');
+    if (targetInfoSpan) {
+      targetInfoSpan.textContent = label;
+    }
 
     document.body.appendChild(this.bannerEl);
 
